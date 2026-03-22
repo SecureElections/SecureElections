@@ -1,2 +1,2 @@
 # SecureElections
-SecureElections is a secure and reliable Software for Goverment Elections of all sizes.
+SecureElections is a secure and reliable software for government elections of all sizes.
