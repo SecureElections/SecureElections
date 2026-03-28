@@ -1,0 +1,173 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+
+jobs:
+  go-lint:
+    name: Lint Go code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest
+          problem-matchers: true
+          args: --timeout 2m
+
+      - name: Run go goimports
+        run: go run golang.org/x/tools/cmd/goimports@latest -w `find . -name '*.go' | grep -v '_gen.go$' | grep -v '.pb.go$'`
+      - run: go mod tidy
+      - name: Verify no changes from goimports and go mod tidy
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            echo 'To fix this check, run "make format" and commit the changes'
+            exit 1
+          fi
+
+      - name: Run go generate
+        run: go generate ./...
+      - name: Verify no changes from go generate
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            echo 'Generated code is out of date. Run "make gen" and commit the changes'
+            exit 1
+          fi
+  go-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Environment
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+
+      - name: Formate Codebase
+        run: go fmt ./...
+
+  go-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Environment
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+
+      - name: Run Tests
+        run: make test
+
+  go-build:
+    needs: [go-test, go-lint, go-fmt]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Environment
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+
+      - name: Build Binary
+        run: make build
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-binary
+          path: ./tmp/main
+          retention-days: 7
+
+  publish-docker:
+    needs: go-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setting Docker Image Metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            SecureElections/SecureElections
+            ghcr.io/SecureElections/SecureElections
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Validate build configuration
+        uses: docker/build-push-action@v7
+        with:
+          call: check
+
+      - name: Build and Push Image
+        uses: docker/build-push-action@v7
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,linux/386
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  create-release:
+    needs: go-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Download Binary
+        uses: actions/download-artifact@v8
+        with:
+          name: main-binary
+          path: ./tmp
+
+      - name: Draft Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          draft: true
+          files: ./tmp/main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
