@@ -1,0 +1,27 @@
+version: "2"
+linters:
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - copyloopvar
+    - dogsled
+    - durationcheck
+    - errorlint
+    - gocritic
+    - gocyclo
+    - goprintffuncname
+    - gosec
+    - misspell
+    - nakedret
+    - nilerr
+    - rowserrcheck
+    - unconvert
+    - whitespace
+  exclusions:
+    rules:
+      - linters:
+          - gosec
+        path: _test\.go
+        text: "G703"
