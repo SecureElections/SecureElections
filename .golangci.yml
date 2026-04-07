@@ -1,27 +1,43 @@
 version: "2"
+run:
+  modules-download-mode: readonly
 linters:
-  enable:
-    - asasalint
-    - asciicheck
-    - bidichk
-    - bodyclose
-    - copyloopvar
-    - dogsled
-    - durationcheck
-    - errorlint
-    - gocritic
-    - gocyclo
-    - goprintffuncname
-    - gosec
-    - misspell
-    - nakedret
-    - nilerr
-    - rowserrcheck
-    - unconvert
-    - whitespace
+  default: all
+  disable:
+    - wsl
+    - depguard
+    - exhaustruct
+    - ireturn
+    - lll
+    - paralleltest
+    - varnamelen
+    - wrapcheck
+    - testpackage
   exclusions:
+    generated: lax
+    presets:
+      - comments
+      - std-error-handling
+      - common-false-positives
+      - legacy
     rules:
       - linters:
           - gosec
         path: _test\.go
         text: "G703"
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+      - node_modules
+formatters:
+  enable:
+    - gofmt
+    - golines
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+      - node_modules
