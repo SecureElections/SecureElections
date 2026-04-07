@@ -41,3 +41,5 @@ formatters:
       - builtin$
       - examples$
       - node_modules
+severity:
+  default: warning
