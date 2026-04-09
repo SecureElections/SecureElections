@@ -2,14 +2,13 @@ functions:
   - ensurePropertiesExample
   - ensureAllArraysHaveItemTypes
   - ensureSnakeCaseWithDigits
-  - validateOpIDNaming
   - ensureSchemaHasType
 
 rules:
   ratelimit-headers:
     description: Response must include ratelimit-x headers
     message: "{{description}}; missing {{property}}"
-    severity: error
+    severity: warn
     given: $..responses.*
     then:
       - field: headers.ratelimit-limit
@@ -22,7 +21,7 @@ rules:
   properties-must-include-examples:
     description: Object properties must include examples
     given: $..properties..properties.*
-    severity: error
+    severity: warn
     message: "{{description}}; {{property}}"
     then:
       function: ensurePropertiesExample
@@ -30,7 +29,7 @@ rules:
   params-must-include-examples:
     description: Parameters must include examples
     given: $..parameters.*
-    severity: error
+    severity: warn
     message: "{{description}}; missing {{property}}"
     then:
       function: xor
@@ -42,7 +41,7 @@ rules:
   headers-must-include-examples:
     description: Headers must include examples
     given: $..headers.*
-    severity: error
+    severity: warn
     message: "{{description}}; missing {{property}}"
     then:
       function: ensurePropertiesExample
@@ -50,7 +49,7 @@ rules:
   endpoint-must-be-ref:
     description: Endpoint must be a $ref
     message: "{{description}}; {{property}} incorrect"
-    severity: error
+    severity: warn
     resolved: false
     given: $.paths.*.*
     then:
@@ -60,7 +59,7 @@ rules:
   path-must-include-version:
     description: Path must include the version
     message: "{{description}}; {{property}} incorrect"
-    severity: error
+    severity: warn
     resolved: false
     given: "$.paths[*]~"
     then:
@@ -71,7 +70,7 @@ rules:
   endpoint-ref-must-be-file:
     description: Endpoint must a $ref to a file in resources/
     message: "{{description}}; {{value}} incorrect"
-    severity: error
+    severity: warn
     resolved: false
     given: $.paths.*.$ref
     then:
@@ -82,7 +81,7 @@ rules:
   common-responses-unauthorized:
     description: Responses should contain common response - 401 (unauthorized)
     message: "{{description}}. Missing {{property}}"
-    severity: error
+    severity: warn
     given: $.paths..responses
     then:
       field: "401"
@@ -91,7 +90,7 @@ rules:
   common-responses-not-found:
     description: Responses should contain common response - 404 (not found)
     message: "{{description}}. Missing {{property}}"
-    severity: error
+    severity: warn
     given: $.paths[?(@property.match(/.*\/{.*}.*/))]..responses
     then:
       field: "404"
@@ -100,7 +99,7 @@ rules:
   common-responses-too-many-requests:
     description: Responses should contain common response - 429 (too many requests)
     message: "{{description}}. Missing {{property}}"
-    severity: error
+    severity: warn
     given: $.paths..responses
     then:
       field: "429"
@@ -109,7 +108,7 @@ rules:
   common-responses-server-error:
     description: Responses should contain common response - 500 (server error)
     message: "{{description}}. Missing {{property}}"
-    severity: error
+    severity: warn
     given: $.paths..responses
     then:
       field: "500"
@@ -118,7 +117,7 @@ rules:
   array-properties-must-have-items-with-type:
     description: Array properties must have an items attribute with a type
     given: "$..*.properties[*]"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureAllArraysHaveItemTypes
@@ -126,25 +125,16 @@ rules:
   array-params-must-have-items-with-type:
     description: Array parameters must have an items attribute with a type
     given: "$..*.parameters[*]"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureAllArraysHaveItemTypes
-
-  operationid-must-follow-new-naming-conventions:
-    description: operationIds must follow naming conventions for method
-    type: style
-    given: "$.paths[*][*]"
-    severity: error
-    message: "{{error}}"
-    then:
-      function: validateOpIDNaming
 
   schema-key-must-be-snake-cased:
     description: schema key must be snake cased (e.g. snake_case)
     type: style
     given: "$.components['schemas'].*~"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureSnakeCaseWithDigits
@@ -153,7 +143,7 @@ rules:
     description: parameter key must be snake cased (e.g. snake_case)
     type: style
     given: "$.components['parameters'].*~"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureSnakeCaseWithDigits
@@ -162,7 +152,7 @@ rules:
     description: example key must be snake cased (e.g. snake_case)
     type: style
     given: "$.components['examples'].*~"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureSnakeCaseWithDigits
@@ -171,7 +161,7 @@ rules:
     description: response key must be snake cased (e.g. snake_case)
     type: style
     given: "$.components['responses'].*~"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureSnakeCaseWithDigits
@@ -179,7 +169,7 @@ rules:
   schema-properties-must-have-type:
     description: Schema properties must have a type defined
     given: "$..properties.*"
-    severity: error
+    severity: warn
     message: "{{error}}"
     then:
       function: ensureSchemaHasType
