@@ -37,13 +37,19 @@ ent-install:
 air-install:
     go install github.com/air-verse/air@latest
 
-# Generate Ent code
-ent-gen:
-    go generate ./ent
+# Generate (Ent) code
+gen:
+    go generate ./...
 
 # Create a new Ent entity (e.g., just ent-new MyEntity)
 ent-new name:
     go run entgo.io/ent/cmd/ent new {{ name }}
+
+format:
+  go run golang.org/x/tools/cmd/goimports@latest -w `find . -name '*.go' | grep -v _gen.go$$ | grep -v .pb.go$$`
+  go mod tidy 
+  go fmt ./... 
+  npx prettier -w .
 
 # Create a new admin user (e.g., just admin myemail@web.com)
 admin email:
