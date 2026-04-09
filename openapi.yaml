@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   version: 1.0.0
   title: SecureElections.software
-  termsOfService: 'https://secureelections.software/terms/'
+  termsOfService: "https://secureelections.software/terms/"
   contact:
     email: info@secureelections.software
     url: https://secureelections.software/contact
@@ -10,17 +10,17 @@ info:
     name: GPL-3.0
     url: https://www.gnu.org/licenses/gpl-3.0.html
   x-logo:
-    url: 'https://github.com/SecureElections/SecureElections/img/SecureElections.jpg'
+    url: "https://github.com/SecureElections/SecureElections/img/SecureElections.jpg"
   description: |
     Tis is the API Spec for https://github.com/SecureElections/SecureElections
-    
+
 tags:
   - name: Test
     description: Example echo operations.
 servers:
-  - url: 'http://demo.secureelections.software/api/v1'
+  - url: "http://demo.secureelections.software/api/v1"
 paths:
-  '/users/{username}':
+  "/users/{username}":
     parameters:
       - name: pretty_print
         in: query
@@ -49,21 +49,21 @@ paths:
             type: boolean
       security:
         - main_auth:
-            - 'read:users'
+            - "read:users"
         - api_key: []
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
               example:
                 username: user1
                 email: user@example.com
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: User not found
     put:
       tags:
@@ -80,22 +80,22 @@ paths:
             type: string
       security:
         - main_auth:
-            - 'write:users'
+            - "write:users"
       responses:
-        '200':
+        "200":
           description: OK
-        '400':
+        "400":
           description: Invalid user supplied
-        '404':
+        "404":
           description: User not found
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
           application/xml:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
         description: Updated user object
         required: true
   /echo:
@@ -109,7 +109,7 @@ paths:
         - api_key: []
         - basic_auth: []
       responses:
-        '200':
+        "200":
           description: OK
           headers:
             X-Rate-Limit:
@@ -118,7 +118,7 @@ paths:
                 type: integer
                 format: int32
             X-Expires-After:
-              $ref: '#/components/headers/ExpiresAfter'
+              $ref: "#/components/headers/ExpiresAfter"
           content:
             application/json:
               schema:
@@ -180,7 +180,7 @@ paths:
         - api_key: []
         - basic_auth: []
       responses:
-        '200':
+        "200":
           description: OK
           headers:
             X-Rate-Limit:
@@ -189,16 +189,16 @@ paths:
                 type: integer
                 format: int32
             X-Expires-After:
-              $ref: '#/components/headers/ExpiresAfter'
+              $ref: "#/components/headers/ExpiresAfter"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Schema'
+                $ref: "#/components/schemas/Schema"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Schema'
+              $ref: "#/components/schemas/Schema"
         description: requestBody description
         required: true
   /pathItemWithExamples:
@@ -213,7 +213,7 @@ paths:
         - api_key: []
         - basic_auth: []
       responses:
-        '200':
+        "200":
           description: OK
           headers:
             X-Rate-Limit:
@@ -222,16 +222,16 @@ paths:
                 type: integer
                 format: int32
             X-Expires-After:
-              $ref: '#/components/headers/ExpiresAfter'
+              $ref: "#/components/headers/ExpiresAfter"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Schema'
+                $ref: "#/components/schemas/Schema"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Schema'
+              $ref: "#/components/schemas/Schema"
             examples:
               mapName:
                 summary: My first example
@@ -249,10 +249,10 @@ components:
       type: oauth2
       flows:
         implicit:
-          authorizationUrl: 'http://example.com/api/oauth/dialog'
+          authorizationUrl: "http://example.com/api/oauth/dialog"
           scopes:
-            'read:users': read users info
-            'write:users': modify or remove users
+            "read:users": read users info
+            "write:users": modify or remove users
     api_key:
       type: apiKey
       in: header
@@ -285,7 +285,7 @@ components:
           minLength: 1
           example: Smith
         email:
-          $ref: '#/components/schemas/Email'
+          $ref: "#/components/schemas/Email"
     Schema:
       type: object
       title: Scalars
@@ -331,39 +331,39 @@ components:
             - instance
             - illustration
         stringDateTime:
-          description: 'Property name''s description (type is string, format is date-time)'
+          description: "Property name's description (type is string, format is date-time)"
           type: string
           format: date-time
         stringDate:
-          description: 'Property name''s description (type is string, format is date-time)'
+          description: "Property name's description (type is string, format is date-time)"
           type: string
           format: date
         stringEmail:
-          description: 'Property name''s description (type is string, format is email)'
+          description: "Property name's description (type is string, format is email)"
           type: string
           format: email
         stringIpAddressV4:
-          description: 'Property name''s description (type is string, format is ipv4 address)'
+          description: "Property name's description (type is string, format is ipv4 address)"
           type: string
           format: ipv4
         stringIpAddressV6:
-          description: 'Property name''s description (type is string, format is ipv6 address)'
+          description: "Property name's description (type is string, format is ipv6 address)"
           type: string
           format: ipv6
         stringPassword:
-          description: 'Property name''s description (type is string, format is password)'
+          description: "Property name's description (type is string, format is password)"
           type: string
           format: password
         stringHostname:
-          description: 'Property name''s description (type is string, format is hostname)'
+          description: "Property name's description (type is string, format is hostname)"
           type: string
           format: hostname
         stringUri:
-          description: 'Property name''s description (type is string, format is uri)'
+          description: "Property name's description (type is string, format is uri)"
           type: string
           format: uri
         stringUuid:
-          description: 'Property name''s description (type is string, format is uuid)'
+          description: "Property name's description (type is string, format is uuid)"
           type: string
           format: uuid
         numberProperty:
@@ -371,11 +371,11 @@ components:
           type: number
           example: 8
         numberFloat:
-          description: 'Property name''s description (type is number, format is float)'
+          description: "Property name's description (type is number, format is float)"
           type: number
           format: float
         numberDouble:
-          description: 'Property name''s description (type is number, format is double)'
+          description: "Property name's description (type is number, format is double)"
           type: number
           format: double
         numberGreaterThanOrEquals:
@@ -411,11 +411,11 @@ components:
           description: Property name's description (type is integer)
           type: integer
         integer32bit:
-          description: 'Property name''s description (type is integer, format is int32)'
+          description: "Property name's description (type is integer, format is int32)"
           type: integer
           format: int32
         integer64bit:
-          description: 'Property name''s description (type is integer, format is int64)'
+          description: "Property name's description (type is integer, format is int64)"
           type: integer
           format: int64
         booleanProperty:
