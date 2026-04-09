@@ -13,6 +13,11 @@ linters:
     - varnamelen
     - wrapcheck
     - testpackage
+    - canonicalheader
+    - err113
+    - mnd
+    - revive
+    - gochecknoglobals
   exclusions:
     generated: lax
     presets:
