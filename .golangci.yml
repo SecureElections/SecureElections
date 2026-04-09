@@ -2,22 +2,26 @@ version: "2"
 run:
   modules-download-mode: readonly
 linters:
-  default: all
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - copyloopvar
+    - dogsled
+    - durationcheck
+    - errorlint
+    - gocritic
+    - gocyclo
+    - goprintffuncname
+    - misspell
+    - nakedret
+    - nilerr
+    - rowserrcheck
+    - unconvert
+    - whitespace
   disable:
-    - wsl
-    - depguard
-    - exhaustruct
-    - ireturn
-    - lll
-    - paralleltest
-    - varnamelen
-    - wrapcheck
-    - testpackage
-    - canonicalheader
-    - err113
-    - mnd
-    - revive
-    - gochecknoglobals
+    - staticcheck
+    - unused
   exclusions:
     generated: lax
     presets:
