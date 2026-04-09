@@ -11,9 +11,6 @@ before:
 metadata:
   mod_timestamp: "{{ .CommitTimestamp }}"
 
-git:
-  tag_sort: smartsemver
-
 builds:
   - main: ./cmd/web/main.go
     ldflags:
@@ -28,7 +25,6 @@ builds:
       - loong64
       - ppc64
       - riscv64
-source:
 
 nfpms:
   - vendor: SecureElections

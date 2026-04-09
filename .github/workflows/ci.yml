@@ -107,6 +107,7 @@ jobs:
 
   go-release:
     name: Create new Release
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: [go-test, go-lint, go-fmt]
     runs-on: ubuntu-latest
     permissions:
