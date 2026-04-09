@@ -145,6 +145,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - uses: extractions/setup-just@v3
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:

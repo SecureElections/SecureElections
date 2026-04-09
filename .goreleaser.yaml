@@ -3,10 +3,9 @@ version: 2
 project_name: SecureElections
 before:
   hooks:
-    - go mod tidy
-    - go generate ./...
-    #- make tailwind-install
-    - ./tailwindcss -i tailwind.css -o public/static/main.css -m
+    - just gen
+    - just css
+    - just format
 
 metadata:
   mod_timestamp: "{{ .CommitTimestamp }}"
@@ -51,9 +50,7 @@ changelog:
     exclude:
       - "^test:"
       - "^test\\("
-      - "^test("
       - "^chore\\("
-      - "^chore("
       - "^chore: schema update$"
       - "^chore\\(deps\\): "
       - "^(build|ci): "
