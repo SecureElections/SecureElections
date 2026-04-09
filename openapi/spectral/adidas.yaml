@@ -24,7 +24,7 @@ rules:
 
   adidas-definitions-camelCase-alphanumeric:
     description: All YAML/JSON definitions MUST follow fields-camelCase and be ASCII alphanumeric characters or `_` or `$`.
-    severity: error
+    severity: warn
     recommended: true
     message: "{{property}} MUST follow camelCase and be ASCII alphanumeric characters or `_` or `$`."
     given: $.definitions[*]~
@@ -35,7 +35,7 @@ rules:
 
   adidas-properties-camelCase-alphanumeric:
     description: All JSON Schema properties MUST follow fields-camelCase and be ASCII alphanumeric characters or `_` or `$`.
-    severity: error
+    severity: warn
     recommended: true
     message: "{{property}} MUST follow camelCase and be ASCII alphanumeric characters or `_` or `$`."
     given: $.definitions..properties[*]~
@@ -46,7 +46,7 @@ rules:
 
   adidas-request-GET-no-body:
     description: "A 'GET' request MUST NOT accept a 'body` parameter"
-    severity: error
+    severity: warn
     given: $.paths..get.parameters..in
     then:
       function: pattern
@@ -67,7 +67,7 @@ rules:
 
   adidas-headers-hyphenated-pascal-case:
     description: All `HTTP` headers MUST use `Hyphenated-Pascal-Case` notation
-    severity: error
+    severity: warn
     given: "$..parameters[?(@.in == 'header')].name"
     message: "'HTTP' headers MUST follow 'Hyphenated-Pascal-Case' notation"
     recommended: true
@@ -86,7 +86,7 @@ rules:
     formats:
       - oas2
     recommended: true
-    severity: error
+    severity: warn
     type: "style"
     message: "Schemes MUST be https and no other value is allowed."
     given: $
@@ -121,7 +121,7 @@ rules:
 
   adidas-oas2-example-exists-in-parameters:
     description: All models MUST have a valid example.
-    severity: error
+    severity: warn
     recommended: true
     formats:
       - oas2
@@ -134,7 +134,7 @@ rules:
 
   adidas-oas2-response-success-hal: # schemes and/or produces
     description: "All success responses MUST be of media type `application/hal+json`"
-    severity: error
+    severity: warn
     given: $.paths..responses[?( @property >= 200 && @property < 300 && @property != 204)]
     recommended: true
     type: "style"
@@ -150,7 +150,7 @@ rules:
 
   adidas-oas2-response-error-problem: # schemas and/or produces
     description: All error responses MUST be of media type `application/problem+json`
-    severity: error
+    severity: warn
     formats:
       - oas2
     given: $.paths..responses[?( @property >= 400 && @property < 600 )]
@@ -173,7 +173,7 @@ rules:
     formats:
       - oas3
     recommended: true
-    severity: error
+    severity: warn
     message: "{{description}}: {{error}}"
     given: $.paths.[*].requestBody.content[?(@property.indexOf('json') === -1)]^
     then:
@@ -186,7 +186,7 @@ rules:
     formats:
       - oas3
     recommended: true
-    severity: error
+    severity: warn
     message: "Servers MUST be https and no other protocol is allowed."
     given: $.servers..url
     then:
@@ -196,7 +196,7 @@ rules:
 
   adidas-oas3-response-success-hal:
     description: "All success responses MUST be of media type `application/hal+json` "
-    severity: error
+    severity: warn
     given: $.paths..responses[?( @property >= 201 && @property < 300 && @property != 204)].content[*]~
     recommended: true
     formats:
@@ -211,7 +211,7 @@ rules:
   # sync and async patterns that can return hal OR problem+json
   adidas-oas3-response-success-OK:
     description: "All success responses MUST be of media type `application/hal+json` or `application/problem+json`"
-    severity: error
+    severity: warn
     given: $.paths..responses[?( @property == 200 )].content[*]~
     recommended: true
     formats:
@@ -226,7 +226,7 @@ rules:
 
   adidas-oas3-response-success-hal-body: # schemes and/or produces
     description: "All success responses MUST follow `application/hal+json` schema"
-    severity: error
+    severity: warn
     given: $.paths..responses[?( @property == 200 && @property < 300 && @property != 204)].content[?(@property === "application/hal+json")]
     recommended: true
     type: "style"
