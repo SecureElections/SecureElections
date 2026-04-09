@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -18,9 +17,9 @@ import (
 func TestAuthClient_Auth(t *testing.T) {
 	assertNoAuth := func() {
 		_, err := c.Auth.GetAuthenticatedUserID(ctx)
-		assert.True(t, errors.Is(err, NotAuthenticatedError{}))
+		assert.ErrorIs(t, err, NotAuthenticatedError{})
 		_, err = c.Auth.GetAuthenticatedUser(ctx)
-		assert.True(t, errors.Is(err, NotAuthenticatedError{}))
+		assert.ErrorIs(t, err, NotAuthenticatedError{})
 	}
 
 	assertNoAuth()
@@ -86,7 +85,7 @@ func TestAuthClient_GetValidPasswordToken(t *testing.T) {
 
 func TestAuthClient_DeletePasswordTokens(t *testing.T) {
 	// Create three tokens for the user
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_, _, err := c.Auth.GeneratePasswordResetToken(ctx, usr.ID)
 		require.NoError(t, err)
 	}

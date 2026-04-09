@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"io"
 	"time"
 
@@ -24,6 +23,7 @@ func init() {
 
 func (h *Files) Init(c *services.Container) error {
 	h.files = c.Files
+
 	return nil
 }
 
@@ -55,6 +55,7 @@ func (h *Files) Submit(ctx echo.Context) error {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		msg.Error(ctx, "A file is required.")
+
 		return h.Page(ctx)
 	}
 
@@ -74,7 +75,7 @@ func (h *Files) Submit(ctx echo.Context) error {
 		return err
 	}
 
-	msg.Success(ctx, fmt.Sprintf("%s was uploaded successfully.", file.Filename))
+	msg.Success(ctx, file.Filename+" was uploaded successfully.")
 
 	return h.Page(ctx)
 }

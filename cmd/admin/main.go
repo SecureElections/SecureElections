@@ -14,14 +14,17 @@ import (
 func main() {
 	// Start a new container.
 	c := services.NewContainer()
+
 	defer func() {
 		// Gracefully shutdown all services.
-		if err := c.Shutdown(); err != nil {
+		err := c.Shutdown()
+		if err != nil {
 			log.Default().Error("shutdown failed", "error", err)
 		}
 	}()
 
 	var email string
+
 	flag.StringVar(&email, "email", "", "email address for the admin user")
 	flag.Parse()
 
@@ -44,7 +47,6 @@ func main() {
 		SetVerified(true).
 		SetPassword(pw).
 		Exec(context.Background())
-
 	if err != nil {
 		invalid(err.Error())
 	}

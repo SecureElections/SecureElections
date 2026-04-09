@@ -36,6 +36,7 @@ func TestCache_SetIfNotExists(t *testing.T) {
 	called := 0
 	callback := func() Node {
 		called++
+
 		return Div(Text("hello"))
 	}
 
@@ -46,11 +47,13 @@ func TestCache_SetIfNotExists(t *testing.T) {
 	}
 
 	got := SetIfNotExists(key, callback)
+
 	assert.Equal(t, 1, called)
 	require.NotNil(t, got)
 	assertRender(got)
 
 	got = SetIfNotExists(key, callback)
+
 	assert.Equal(t, 1, called)
 	require.NotNil(t, got)
 	assertRender(got)

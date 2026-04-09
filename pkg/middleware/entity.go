@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -26,17 +27,21 @@ func LoadUser(orm *ent.Client) echo.MiddlewareFunc {
 				Where(user.ID(userID)).
 				Only(c.Request().Context())
 
-			switch err.(type) {
-			case nil:
-				c.Set(context.UserKey, u)
-				return next(c)
-			case *ent.NotFoundError:
-				return echo.NewHTTPError(http.StatusNotFound)
-			default:
-				return echo.NewHTTPError(
-					http.StatusInternalServerError,
-					fmt.Sprintf("error querying user: %v", err),
-				)
+			{
+				var errCase0 *ent.NotFoundError
+				switch {
+				case err == nil:
+					c.Set(context.UserKey, u)
+
+					return next(c)
+				case errors.As(err, &errCase0):
+					return echo.NewHTTPError(http.StatusNotFound)
+				default:
+					return echo.NewHTTPError(
+						http.StatusInternalServerError,
+						fmt.Sprintf("error querying user: %v", err),
+					)
+				}
 			}
 		}
 	}

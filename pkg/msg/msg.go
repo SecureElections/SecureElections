@@ -69,6 +69,7 @@ func Get(ctx echo.Context, typ Type) []string {
 			for _, m := range flash {
 				msgs = append(msgs, m.(string))
 			}
+
 			return msgs
 		}
 	}
@@ -84,12 +85,14 @@ func getSession(ctx echo.Context) (*sessions.Session, error) {
 			"error", err,
 		)
 	}
+
 	return sess, err
 }
 
 // save saves the flash message session.
 func save(ctx echo.Context, sess *sessions.Session) {
-	if err := sess.Save(ctx.Request(), ctx.Response()); err != nil {
+	err := sess.Save(ctx.Request(), ctx.Response())
+	if err != nil {
 		log.Ctx(ctx).Error("failed to set flash message",
 			"error", err,
 		)

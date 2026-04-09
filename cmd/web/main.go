@@ -18,13 +18,15 @@ import (
 func main() {
 	// Start a new container.
 	c := services.NewContainer()
+
 	defer func() {
 		// Gracefully shutdown all services.
 		fatal("shutdown failed", c.Shutdown())
 	}()
 
 	// Build the router.
-	if err := handlers.BuildRouter(c); err != nil {
+	err := handlers.BuildRouter(c)
+	if err != nil {
 		fatal("failed to build the router", err)
 	}
 
@@ -53,7 +55,8 @@ func main() {
 			}
 		}
 
-		if err := c.Web.StartServer(&srv); errors.Is(err, http.ErrServerClosed) {
+		err := c.Web.StartServer(&srv)
+		if errors.Is(err, http.ErrServerClosed) {
 			fatal("shutting down the server", err)
 		}
 	}()

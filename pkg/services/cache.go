@@ -10,11 +10,11 @@ import (
 	"github.com/maypok86/otter"
 )
 
-// ErrCacheMiss indicates that the requested key does not exist in the cache
+// ErrCacheMiss indicates that the requested key does not exist in the cache.
 var ErrCacheMiss = errors.New("cache miss")
 
 type (
-	// CacheStore provides an interface for cache storage
+	// CacheStore provides an interface for cache storage.
 	CacheStore interface {
 		// get attempts to get a cached value
 		get(context.Context, *CacheGetOp) (any, error)
@@ -29,13 +29,13 @@ type (
 		close()
 	}
 
-	// CacheClient is the client that allows you to interact with the cache
+	// CacheClient is the client that allows you to interact with the cache.
 	CacheClient struct {
 		// store holds the Cache storage
 		store CacheStore
 	}
 
-	// CacheSetOp handles chaining a set operation
+	// CacheSetOp handles chaining a set operation.
 	CacheSetOp struct {
 		client     *CacheClient
 		key        string
@@ -45,14 +45,14 @@ type (
 		tags       []string
 	}
 
-	// CacheGetOp handles chaining a get operation
+	// CacheGetOp handles chaining a get operation.
 	CacheGetOp struct {
 		client *CacheClient
 		key    string
 		group  string
 	}
 
-	// CacheFlushOp handles chaining a flush operation
+	// CacheFlushOp handles chaining a flush operation.
 	CacheFlushOp struct {
 		client *CacheClient
 		key    string
@@ -60,7 +60,7 @@ type (
 		tags   []string
 	}
 
-	// inMemoryCacheStore is a cache store implementation in memory
+	// inMemoryCacheStore is a cache store implementation in memory.
 	inMemoryCacheStore struct {
 		store    *otter.CacheWithVariableTTL[string, any]
 		tagIndex *tagIndex
@@ -76,81 +76,88 @@ type (
 	// be evicted poses challenges.
 	tagIndex struct {
 		sync.Mutex
+
 		tags map[string]map[string]struct{} // tag->keys
 		keys map[string]map[string]struct{} // key->tags
 	}
 )
 
-// NewCacheClient creates a new cache client
+// NewCacheClient creates a new cache client.
 func NewCacheClient(store CacheStore) *CacheClient {
 	return &CacheClient{store: store}
 }
 
-// Close closes the connection to the cache
+// Close closes the connection to the cache.
 func (c *CacheClient) Close() {
 	c.store.close()
 }
 
-// Set creates a cache set operation
+// Set creates a cache set operation.
 func (c *CacheClient) Set() *CacheSetOp {
 	return &CacheSetOp{
 		client: c,
 	}
 }
 
-// Get creates a cache get operation
+// Get creates a cache get operation.
 func (c *CacheClient) Get() *CacheGetOp {
 	return &CacheGetOp{
 		client: c,
 	}
 }
 
-// Flush creates a cache flush operation
+// Flush creates a cache flush operation.
 func (c *CacheClient) Flush() *CacheFlushOp {
 	return &CacheFlushOp{
 		client: c,
 	}
 }
 
-// cacheKey formats a cache key with an optional group
+// cacheKey formats a cache key with an optional group.
 func (c *CacheClient) cacheKey(group, key string) string {
 	if group != "" {
 		return fmt.Sprintf("%s::%s", group, key)
 	}
+
 	return key
 }
 
-// Key sets the cache key
+// Key sets the cache key.
 func (c *CacheSetOp) Key(key string) *CacheSetOp {
 	c.key = key
+
 	return c
 }
 
-// Group sets the cache group
+// Group sets the cache group.
 func (c *CacheSetOp) Group(group string) *CacheSetOp {
 	c.group = group
+
 	return c
 }
 
-// Data sets the data to cache
+// Data sets the data to cache.
 func (c *CacheSetOp) Data(data any) *CacheSetOp {
 	c.data = data
+
 	return c
 }
 
-// Expiration sets the expiration duration of the cached data
+// Expiration sets the expiration duration of the cached data.
 func (c *CacheSetOp) Expiration(expiration time.Duration) *CacheSetOp {
 	c.expiration = expiration
+
 	return c
 }
 
-// Tags sets the cache tags
+// Tags sets the cache tags.
 func (c *CacheSetOp) Tags(tags ...string) *CacheSetOp {
 	c.tags = tags
+
 	return c
 }
 
-// Save saves the data in the cache
+// Save saves the data in the cache.
 func (c *CacheSetOp) Save(ctx context.Context) error {
 	switch {
 	case c.key == "":
@@ -164,19 +171,21 @@ func (c *CacheSetOp) Save(ctx context.Context) error {
 	return c.client.store.set(ctx, c)
 }
 
-// Key sets the cache key
+// Key sets the cache key.
 func (c *CacheGetOp) Key(key string) *CacheGetOp {
 	c.key = key
+
 	return c
 }
 
-// Group sets the cache group
+// Group sets the cache group.
 func (c *CacheGetOp) Group(group string) *CacheGetOp {
 	c.group = group
+
 	return c
 }
 
-// Fetch fetches the data from the cache
+// Fetch fetches the data from the cache.
 func (c *CacheGetOp) Fetch(ctx context.Context) (any, error) {
 	if c.key == "" {
 		return nil, errors.New("no cache key specified")
@@ -185,30 +194,33 @@ func (c *CacheGetOp) Fetch(ctx context.Context) (any, error) {
 	return c.client.store.get(ctx, c)
 }
 
-// Key sets the cache key
+// Key sets the cache key.
 func (c *CacheFlushOp) Key(key string) *CacheFlushOp {
 	c.key = key
+
 	return c
 }
 
-// Group sets the cache group
+// Group sets the cache group.
 func (c *CacheFlushOp) Group(group string) *CacheFlushOp {
 	c.group = group
+
 	return c
 }
 
-// Tags sets the cache tags
+// Tags sets the cache tags.
 func (c *CacheFlushOp) Tags(tags ...string) *CacheFlushOp {
 	c.tags = tags
+
 	return c
 }
 
-// Execute flushes the data from the cache
+// Execute flushes the data from the cache.
 func (c *CacheFlushOp) Execute(ctx context.Context) error {
 	return c.client.store.flush(ctx, c)
 }
 
-// newInMemoryCache creates a new in-memory CacheStore
+// newInMemoryCache creates a new in-memory CacheStore.
 func newInMemoryCache(capacity int) (CacheStore, error) {
 	s := &inMemoryCacheStore{
 		tagIndex: newTagIndex(),
@@ -220,7 +232,6 @@ func newInMemoryCache(capacity int) (CacheStore, error) {
 			s.tagIndex.purgeKeys(key)
 		}).
 		Build()
-
 	if err != nil {
 		return nil, err
 	}
@@ -303,6 +314,7 @@ func (i *tagIndex) setTags(key string, tags ...string) {
 		if _, exists := i.tags[tag]; !exists {
 			i.tags[tag] = make(map[string]struct{})
 		}
+
 		i.tags[tag][key] = struct{}{}
 		i.keys[key][tag] = struct{}{}
 	}
@@ -320,6 +332,7 @@ func (i *tagIndex) purgeTags(tags ...string) []string {
 
 			for key := range tagKeys {
 				delete(i.keys[key], tag)
+
 				if len(i.keys[key]) == 0 {
 					delete(i.keys, key)
 				}
@@ -342,6 +355,7 @@ func (i *tagIndex) purgeKeys(keys ...string) {
 
 			for tag := range keyTags {
 				delete(i.tags[tag], key)
+
 				if len(i.tags[tag]) == 0 {
 					delete(i.tags, tag)
 				}

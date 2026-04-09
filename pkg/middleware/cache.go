@@ -15,7 +15,9 @@ func CacheControl(maxAge time.Duration) echo.MiddlewareFunc {
 			if maxAge > 0 {
 				v = fmt.Sprintf("public, max-age=%.0f", maxAge.Seconds())
 			}
+
 			ctx.Response().Header().Set("Cache-Control", v)
+
 			return next(ctx)
 		}
 	}

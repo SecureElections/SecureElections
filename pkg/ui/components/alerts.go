@@ -9,8 +9,10 @@ import (
 )
 
 func FlashMessages(r *ui.Request) Node {
-	var g Group
-	var color Color
+	var (
+		g     Group
+		color Color
+	)
 
 	for _, typ := range []msg.Type{
 		msg.TypeSuccess,

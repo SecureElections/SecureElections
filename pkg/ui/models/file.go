@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"strconv"
 
 	. "maragu.dev/gomponents"
 	. "maragu.dev/gomponents/html"
@@ -16,7 +16,7 @@ type File struct {
 func (f *File) Render() Node {
 	return Tr(
 		Td(Text(f.Name)),
-		Td(Text(fmt.Sprint(f.Size))),
+		Td(Text(strconv.FormatInt(f.Size, 10))),
 		Td(Text(f.Modified)),
 	)
 }
