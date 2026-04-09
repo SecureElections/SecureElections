@@ -23,9 +23,9 @@ func TestSetRequest(t *testing.T) {
 	ctx.Request().Header.Set(HeaderHistoryRestoreRequest, "true")
 
 	r := GetRequest(ctx)
-	assert.Equal(t, true, r.Enabled)
-	assert.Equal(t, true, r.Boosted)
-	assert.Equal(t, true, r.HistoryRestore)
+	assert.True(t, r.Enabled)
+	assert.True(t, r.Boosted)
+	assert.True(t, r.HistoryRestore)
 	assert.Equal(t, "a", r.Trigger)
 	assert.Equal(t, "b", r.TriggerName)
 	assert.Equal(t, "c", r.Target)

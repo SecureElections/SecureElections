@@ -124,7 +124,12 @@ func sidebarMenu(r *ui.Request) Node {
 		for _, n := range admin.GetEntityTypes() {
 			entityTypeLinks = append(
 				entityTypeLinks,
-				MenuLink(r, icons.PencilSquare(), n.GetName(), routenames.AdminEntityList(n.GetName())),
+				MenuLink(
+					r,
+					icons.PencilSquare(),
+					n.GetName(),
+					routenames.AdminEntityList(n.GetName()),
+				),
 			)
 		}
 
@@ -172,7 +177,15 @@ func sidebarMenu(r *ui.Request) Node {
 				If(r.IsAuth, MenuLink(r, icons.Exit(), "Logout", routenames.Logout)),
 				If(!r.IsAuth, MenuLink(r, icons.Enter(), "Login", routenames.Login)),
 				If(!r.IsAuth, MenuLink(r, icons.UserPlus(), "Register", routenames.Register)),
-				If(!r.IsAuth, MenuLink(r, icons.QuestionCircle(), "Forgot password", routenames.ForgotPasswordSubmit)),
+				If(
+					!r.IsAuth,
+					MenuLink(
+						r,
+						icons.QuestionCircle(),
+						"Forgot password",
+						routenames.ForgotPasswordSubmit,
+					),
+				),
 				Iff(r.IsAdmin, adminSubMenu),
 			),
 		),

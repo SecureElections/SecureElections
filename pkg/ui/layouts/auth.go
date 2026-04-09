@@ -26,7 +26,10 @@ func Auth(r *ui.Request, content Node) Node {
 							Class("card shadow-md bg-base-200 w-96"),
 							Div(
 								Class("card-body"),
-								If(len(r.Title) > 0, H1(Class("text-2xl font-bold"), Text(r.Title))),
+								If(
+									len(r.Title) > 0,
+									H1(Class("text-2xl font-bold"), Text(r.Title)),
+								),
 								FlashMessages(r),
 								content,
 							),

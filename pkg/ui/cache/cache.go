@@ -36,16 +36,20 @@ var (
 // applications will have many, so maybe this is useful.
 func Set(key string, node gomponents.Node) {
 	buf := bytes.NewBuffer(nil)
-	if err := node.Render(buf); err != nil {
+
+	err := node.Render(buf)
+	if err != nil {
 		log.Default().Error("failed to cache ui node",
 			"error", err,
 			"key", key,
 		)
+
 		return
 	}
 
 	mu.Lock()
 	defer mu.Unlock()
+
 	cache[key] = gomponents.Raw(buf.String())
 }
 
@@ -53,6 +57,7 @@ func Set(key string, node gomponents.Node) {
 func Get(key string) gomponents.Node {
 	mu.RLock()
 	defer mu.RUnlock()
+
 	return cache[key]
 }
 
@@ -65,5 +70,6 @@ func SetIfNotExists(key string, gen func() gomponents.Node) gomponents.Node {
 
 	n := gen()
 	Set(key, n)
+
 	return n
 }

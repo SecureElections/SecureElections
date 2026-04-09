@@ -2,13 +2,12 @@ package ui
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
-var (
-	// cacheBuster stores the current time as a cache buster for static files.
-	cacheBuster = fmt.Sprint(time.Now().Unix())
-)
+// cacheBuster stores the current time as a cache buster for static files.
+var cacheBuster = strconv.FormatInt(time.Now().Unix(), 10)
 
 // PublicFile generates a relative URL to a public file.
 func PublicFile(filepath string) string {
