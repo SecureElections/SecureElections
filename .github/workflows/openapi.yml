@@ -1,3 +1,4 @@
+name: OpenAPI
 on:
   push:
     branches: [main]
@@ -23,7 +24,7 @@ jobs:
           ref: ${{ github.head_ref }}
           persist-credentials: true
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
       - run: |
           npm install
           npx prettier . --write
@@ -38,6 +39,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
 
       - name: Install Redocly CLI and Spectral rules
         run: |
