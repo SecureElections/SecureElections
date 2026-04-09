@@ -1,12 +1,17 @@
-name: CI/CD Pipeline
+name: Go Pipeline
 
 on:
   push:
     branches: [main]
     tags:
       - "v*"
+    paths:
+      - "**/*.go"
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - "**/*.go"
 
 jobs:
   go-lint:
@@ -93,7 +98,12 @@ jobs:
           go-version: "1.26"
 
       - name: Run Tests
-        run: go test -v -covermode=atomic ./...
+        run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   go-release:
     name: Create new Release
@@ -157,34 +167,3 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           subject-checksums: ./dist/digests.txt
-
-  openapi:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v6
-
-      - name: Install Redocly CLI
-        run: |
-          npm install -g @redocly/cli
-          npm install -g @apisyouwonthate/style-guide
-
-      - name: Lint OpenAPI Spec
-        run: redocly lint openapi.yaml
-
-      - name: Bundle OpenAPI Spec
-        run: redocly bundle openapi.yaml -o tmp/openapi-bundled.yaml
-
-      - name: Run Spectral Checks
-        uses: stoplightio/spectral-action@v0.8.13
-        with:
-          file_glob: "openapi.yaml"
-
-      - name: Build HTML Documentation
-        run: redocly build-docs tmp/openapi-bundled.yaml -o tmp/api-docs.html
-
-      - name: Upload Documentation
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-docs
-          path: tmp/api-docs.html
