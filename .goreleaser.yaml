@@ -45,7 +45,7 @@ checksum:
 changelog:
   sort: asc
   use: github
-  format: "{{ .SHA }}: {{ .Message }}{{ if .Logins }} ({{ .Logins | englishJoin }}){{ end }}"
+  format: "{{ .Message }}{{ if .Logins }} ({{ .Logins | englishJoin }}){{ end }}"
   filters:
     exclude:
       - "^test:"
@@ -103,14 +103,9 @@ dockers_v2:
 
 docker_digest:
   name_template: "digests.txt"
-  disable: false
 
 release:
   name_template: "v{{ .Version }}"
-  header: |
-    header
-  footer: |
-    footer
   draft: true
   replace_existing_draft: true
   replace_existing_artifacts: true
