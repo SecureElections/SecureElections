@@ -48,6 +48,7 @@ func NewExampleTaskQueue(c *services.Container) backlite.Queue {
 		log.Default().Info("This can access the container for dependencies",
 			"echo", c.Web.Reverse(routenames.Home),
 		)
+
 		return nil
 	})
 }

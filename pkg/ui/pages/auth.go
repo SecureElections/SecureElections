@@ -30,7 +30,11 @@ func ForgotPassword(ctx echo.Context, form *forms.ForgotPassword) error {
 	g := Group{
 		Div(
 			Class("content"),
-			P(Text("Enter your email address and we'll email you a link that allows you to reset your password.")),
+			P(
+				Text(
+					"Enter your email address and we'll email you a link that allows you to reset your password.",
+				),
+			),
 		),
 		form.Render(r),
 	}

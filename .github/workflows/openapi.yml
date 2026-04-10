@@ -1,0 +1,69 @@
+name: OpenAPI
+on:
+  push:
+    branches: [main]
+    paths:
+      - openapi/**
+      - openapi.yaml
+  pull_request:
+    branches: [main]
+    paths:
+      - openapi/**
+      - openapi.yaml
+
+jobs:
+  openapi-fmt:
+    name: Format everything openapi relatet
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+
+      - uses: actions/setup-node@v6
+      - run: |
+          npm install
+          npx prettier . --write
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: auto-format code [skip ci]"
+
+  openapi:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+
+      - name: Install Redocly CLI and Spectral rules
+        run: |
+          npm install
+
+      - name: Lint OpenAPI Spec
+        run: npx redocly lint openapi.yaml
+
+      - name: Bundle OpenAPI Spec
+        run: npx redocly bundle openapi.yaml -o tmp/openapi-bundled.yaml
+
+      - name: Run Spectral Checks
+        uses: stoplightio/spectral-action@v0.8.13
+        with:
+          file_glob: "openapi.yaml"
+
+      - name: Build HTML Documentation
+        run: npx redocly build-docs tmp/openapi-bundled.yaml -o tmp/api-docs.html
+
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs
+          path: tmp/api-docs.html

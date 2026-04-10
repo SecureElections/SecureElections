@@ -19,7 +19,11 @@ func About(ctx echo.Context) error {
 	tabs := cache.SetIfNotExists("pages.about.Tabs", func() Node {
 		return Group{
 			H2(Text("Frontend")),
-			P(Text("The following incredible projects make developing advanced, modern frontends possible and simple without having to write a single line of JS or CSS. You can go extremely far without leaving the comfort of Go with server-side rendered HTML.")),
+			P(
+				Text(
+					"The following incredible projects make developing advanced, modern frontends possible and simple without having to write a single line of JS or CSS. You can go extremely far without leaving the comfort of Go with server-side rendered HTML.",
+				),
+			),
 			Tabs(
 				[]Tab{
 					{
@@ -37,7 +41,11 @@ func About(ctx echo.Context) error {
 				},
 			),
 			H2(Text("Backend")),
-			P(Text("The following incredible projects provide the foundation of the Go backend. See the repository for a complete list of included projects.")),
+			P(
+				Text(
+					"The following incredible projects provide the foundation of the Go backend. See the repository for a complete list of included projects.",
+				),
+			),
 			Tabs(
 				[]Tab{
 					{

@@ -12,7 +12,7 @@ import (
 )
 
 type Login struct {
-	Email    string `form:"email" validate:"required,email"`
+	Email    string `form:"email"    validate:"required,email"`
 	Password string `form:"password" validate:"required"`
 	form.Submission
 }

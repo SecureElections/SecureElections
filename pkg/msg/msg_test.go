@@ -21,7 +21,7 @@ func TestMsg(t *testing.T) {
 		require.Len(t, ret, 1)
 		assert.Equal(t, message, ret[0])
 		ret = Get(ctx, typ)
-		require.Len(t, ret, 0)
+		require.Empty(t, ret)
 	}
 
 	text := "aaa"

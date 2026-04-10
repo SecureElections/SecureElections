@@ -39,6 +39,7 @@ func TestNewRequest(t *testing.T) {
 			Name: "testing",
 		},
 	})
+
 	r = NewRequest(ctx)
 	assert.Equal(t, "/abc", r.CurrentPath)
 	assert.False(t, r.IsHome)

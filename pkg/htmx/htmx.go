@@ -53,7 +53,7 @@ type (
 	}
 )
 
-// GetRequest extracts HTMX data from the request,
+// GetRequest extracts HTMX data from the request,.
 func GetRequest(ctx echo.Context) *Request {
 	return context.Cache(ctx, context.HTMXRequestKey, func(ctx echo.Context) *Request {
 		return &Request{
@@ -73,24 +73,31 @@ func (r Response) Apply(ctx echo.Context) {
 	if r.PushURL != "" {
 		ctx.Response().Header().Set(HeaderPushURL, r.PushURL)
 	}
+
 	if r.Redirect != "" {
 		ctx.Response().Header().Set(HeaderRedirect, r.Redirect)
 	}
+
 	if r.Refresh {
 		ctx.Response().Header().Set(HeaderRefresh, "true")
 	}
+
 	if r.Trigger != "" {
 		ctx.Response().Header().Set(HeaderTrigger, r.Trigger)
 	}
+
 	if r.TriggerAfterSwap != "" {
 		ctx.Response().Header().Set(HeaderTriggerAfterSwap, r.TriggerAfterSwap)
 	}
+
 	if r.TriggerAfterSettle != "" {
 		ctx.Response().Header().Set(HeaderTriggerAfterSettle, r.TriggerAfterSettle)
 	}
+
 	if r.ReplaceURL != "" {
 		ctx.Response().Header().Set(HeaderReplaceURL, r.ReplaceURL)
 	}
+
 	if r.NoContent {
 		ctx.Response().Status = http.StatusNoContent
 	}

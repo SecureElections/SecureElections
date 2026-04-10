@@ -22,6 +22,7 @@ func init() {
 
 func (h *Cache) Init(c *services.Container) error {
 	h.cache = c.Cache
+
 	return nil
 }
 
@@ -65,7 +66,6 @@ func (h *Cache) Submit(ctx echo.Context) error {
 		Data(input.Value).
 		Expiration(30 * time.Minute).
 		Save(ctx.Request().Context())
-
 	if err != nil {
 		return fail(err, "unable to set cache")
 	}

@@ -114,6 +114,7 @@ func Stats(stats ...Stat) Node {
 			),
 		))
 	}
+
 	return Div(
 		Class("stats shadow"),
 		g,

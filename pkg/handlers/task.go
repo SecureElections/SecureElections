@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -27,6 +28,7 @@ func init() {
 
 func (h *Task) Init(c *services.Container) error {
 	h.tasks = c.Tasks
+
 	return nil
 }
 
@@ -44,12 +46,15 @@ func (h *Task) Submit(ctx echo.Context) error {
 
 	err := form.Submit(ctx, &input)
 
-	switch err.(type) {
-	case nil:
-	case validator.ValidationErrors:
-		return h.Page(ctx)
-	default:
-		return err
+	{
+		var errCase0 validator.ValidationErrors
+		switch {
+		case err == nil:
+		case errors.As(err, &errCase0):
+			return h.Page(ctx)
+		default:
+			return err
+		}
 	}
 
 	// Insert the task
@@ -59,12 +64,14 @@ func (h *Task) Submit(ctx echo.Context) error {
 		}).
 		Wait(time.Duration(input.Delay) * time.Second).
 		Save()
-
 	if err != nil {
 		return fail(err, "unable to create a task")
 	}
 
-	msg.Success(ctx, fmt.Sprintf("The task has been created. Check the logs in %d seconds.", input.Delay))
+	msg.Success(
+		ctx,
+		fmt.Sprintf("The task has been created. Check the logs in %d seconds.", input.Delay),
+	)
 	form.Clear(ctx)
 
 	return h.Page(ctx)

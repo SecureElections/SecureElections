@@ -15,7 +15,7 @@ import (
 
 func TestFormSubmission(t *testing.T) {
 	type formTest struct {
-		Name  string `form:"name" validate:"required"`
+		Name  string `form:"name"  validate:"required"`
 		Email string `form:"email" validate:"required,email"`
 		Submission
 	}
@@ -29,6 +29,7 @@ func TestFormSubmission(t *testing.T) {
 		ctx := e.NewContext(req, httptest.NewRecorder())
 
 		var form formTest
+
 		err := form.Submit(ctx, &form)
 		assert.IsType(t, validator.ValidationErrors{}, err)
 
@@ -38,7 +39,7 @@ func TestFormSubmission(t *testing.T) {
 		assert.True(t, form.FieldHasErrors("Name"))
 		assert.False(t, form.FieldHasErrors("Email"))
 		require.Len(t, form.GetFieldErrors("Name"), 1)
-		assert.Len(t, form.GetFieldErrors("Email"), 0)
+		assert.Empty(t, form.GetFieldErrors("Email"))
 		assert.Equal(t, "This field is required.", form.GetFieldErrors("Name")[0])
 		assert.False(t, form.IsDone())
 
@@ -50,7 +51,9 @@ func TestFormSubmission(t *testing.T) {
 	t.Run("invalid request", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("abc=abc"))
 		ctx := e.NewContext(req, httptest.NewRecorder())
+
 		var form formTest
+
 		err := form.Submit(ctx, &form)
 		assert.IsType(t, new(echo.HTTPError), err)
 	})

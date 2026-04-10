@@ -37,3 +37,8 @@ go.work.sum
 # Editor/IDE
 .idea/
 .vscode/
+# Added by goreleaser init:
+dist/
+
+# node 
+node_modules/
