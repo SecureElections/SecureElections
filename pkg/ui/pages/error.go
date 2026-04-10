@@ -14,6 +14,7 @@ import (
 func Error(ctx echo.Context, code int) error {
 	r := ui.NewRequest(ctx)
 	r.Title = http.StatusText(code)
+
 	var body Node
 
 	switch code {

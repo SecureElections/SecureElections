@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -38,6 +39,7 @@ func (h *Auth) Init(c *services.Container) error {
 	h.orm = c.ORM
 	h.auth = c.Auth
 	h.mail = c.Mail
+
 	return nil
 }
 
@@ -70,18 +72,25 @@ func (h *Auth) ForgotPasswordSubmit(ctx echo.Context) error {
 
 	succeed := func() error {
 		form.Clear(ctx)
-		msg.Success(ctx, "An email containing a link to reset your password will be sent to this address if it exists in our system.")
+		msg.Success(
+			ctx,
+			"An email containing a link to reset your password will be sent to this address if it exists in our system.",
+		)
+
 		return h.ForgotPasswordPage(ctx)
 	}
 
 	err := form.Submit(ctx, &input)
 
-	switch err.(type) {
-	case nil:
-	case validator.ValidationErrors:
-		return h.ForgotPasswordPage(ctx)
-	default:
-		return err
+	{
+		var errCase0 validator.ValidationErrors
+		switch {
+		case err == nil:
+		case errors.As(err, &errCase0):
+			return h.ForgotPasswordPage(ctx)
+		default:
+			return err
+		}
 	}
 
 	// Attempt to load the user.
@@ -90,12 +99,15 @@ func (h *Auth) ForgotPasswordSubmit(ctx echo.Context) error {
 		Where(user.Email(strings.ToLower(input.Email))).
 		Only(ctx.Request().Context())
 
-	switch err.(type) {
-	case *ent.NotFoundError:
-		return succeed()
-	case nil:
-	default:
-		return fail(err, "error querying user during forgot password")
+	{
+		var errCase0 *ent.NotFoundError
+		switch {
+		case errors.As(err, &errCase0):
+			return succeed()
+		case err == nil:
+		default:
+			return fail(err, "error querying user during forgot password")
+		}
 	}
 
 	// Generate the token.
@@ -110,13 +122,13 @@ func (h *Auth) ForgotPasswordSubmit(ctx echo.Context) error {
 
 	// Email the user.
 	url := ctx.Echo().Reverse(routenames.ResetPassword, u.ID, pt.ID, token)
+
 	err = h.mail.
 		Compose().
 		To(u.Email).
 		Subject("Reset your password").
-		Body(fmt.Sprintf("Go here to reset your password: %s", h.config.App.Host+url)).
+		Body("Go here to reset your password: " + h.config.App.Host + url).
 		Send(ctx)
-
 	if err != nil {
 		return fail(err, "error sending password reset email")
 	}
@@ -135,17 +147,21 @@ func (h *Auth) LoginSubmit(ctx echo.Context) error {
 		input.SetFieldError("Email", "")
 		input.SetFieldError("Password", "")
 		msg.Error(ctx, "Invalid credentials. Please try again.")
+
 		return h.LoginPage(ctx)
 	}
 
 	err := form.Submit(ctx, &input)
 
-	switch err.(type) {
-	case nil:
-	case validator.ValidationErrors:
-		return h.LoginPage(ctx)
-	default:
-		return err
+	{
+		var errCase0 validator.ValidationErrors
+		switch {
+		case err == nil:
+		case errors.As(err, &errCase0):
+			return h.LoginPage(ctx)
+		default:
+			return err
+		}
 	}
 
 	// Attempt to load the user.
@@ -154,12 +170,15 @@ func (h *Auth) LoginSubmit(ctx echo.Context) error {
 		Where(user.Email(strings.ToLower(input.Email))).
 		Only(ctx.Request().Context())
 
-	switch err.(type) {
-	case *ent.NotFoundError:
-		return authFailed()
-	case nil:
-	default:
-		return fail(err, "error querying user during login")
+	{
+		var errCase0 *ent.NotFoundError
+		switch {
+		case errors.As(err, &errCase0):
+			return authFailed()
+		case err == nil:
+		default:
+			return fail(err, "error querying user during login")
+		}
 	}
 
 	// Check if the password is correct.
@@ -182,11 +201,13 @@ func (h *Auth) LoginSubmit(ctx echo.Context) error {
 }
 
 func (h *Auth) Logout(ctx echo.Context) error {
-	if err := h.auth.Logout(ctx); err == nil {
+	err := h.auth.Logout(ctx)
+	if err == nil {
 		msg.Success(ctx, "You have been logged out successfully.")
 	} else {
 		msg.Error(ctx, "An error occurred. Please try again.")
 	}
+
 	return redirect.New(ctx).
 		Route(routenames.Home).
 		Go()
@@ -201,12 +222,15 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 
 	err := form.Submit(ctx, &input)
 
-	switch err.(type) {
-	case nil:
-	case validator.ValidationErrors:
-		return h.RegisterPage(ctx)
-	default:
-		return err
+	{
+		var errCase0 validator.ValidationErrors
+		switch {
+		case err == nil:
+		case errors.As(err, &errCase0):
+			return h.RegisterPage(ctx)
+		default:
+			return err
+		}
 	}
 
 	// Attempt creating the user.
@@ -217,19 +241,18 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 		SetPassword(input.Password).
 		Save(ctx.Request().Context())
 
-	switch err.(type) {
-	case nil:
-		log.Ctx(ctx).Info("user created",
-			"user_name", u.Name,
-			"user_id", u.ID,
-		)
-	case *ent.ConstraintError:
-		msg.Warning(ctx, "A user with this email address already exists. Please log in.")
-		return redirect.New(ctx).
-			Route(routenames.Login).
-			Go()
-	default:
-		return fail(err, "unable to create user")
+	{
+		var errCase0 *ent.ConstraintError
+		switch {
+		case err == nil:
+			log.Ctx(ctx).Info("user created", "user_name", u.Name, "user_id", u.ID)
+		case errors.As(err, &errCase0):
+			msg.Warning(ctx, "A user with this email address already exists. Please log in.")
+
+			return redirect.New(ctx).Route(routenames.Login).Go()
+		default:
+			return fail(err, "unable to create user")
+		}
 	}
 
 	// Log the user in.
@@ -240,6 +263,7 @@ func (h *Auth) RegisterSubmit(ctx echo.Context) error {
 			"user_id", u.ID,
 		)
 		msg.Info(ctx, "Your account has been created.")
+
 		return redirect.New(ctx).
 			Route(routenames.Login).
 			Go()
@@ -263,6 +287,7 @@ func (h *Auth) sendVerificationEmail(ctx echo.Context, usr *ent.User) {
 			"user_id", usr.ID,
 			"error", err,
 		)
+
 		return
 	}
 
@@ -273,12 +298,12 @@ func (h *Auth) sendVerificationEmail(ctx echo.Context, usr *ent.User) {
 		Subject("Confirm your email address").
 		Component(emails.ConfirmEmailAddress(ctx, usr.Name, token)).
 		Send(ctx)
-
 	if err != nil {
 		log.Ctx(ctx).Error("unable to send email verification link",
 			"user_id", usr.ID,
 			"error", err,
 		)
+
 		return
 	}
 
@@ -294,12 +319,15 @@ func (h *Auth) ResetPasswordSubmit(ctx echo.Context) error {
 
 	err := form.Submit(ctx, &input)
 
-	switch err.(type) {
-	case nil:
-	case validator.ValidationErrors:
-		return h.ResetPasswordPage(ctx)
-	default:
-		return err
+	{
+		var errCase0 validator.ValidationErrors
+		switch {
+		case err == nil:
+		case errors.As(err, &errCase0):
+			return h.ResetPasswordPage(ctx)
+		default:
+			return err
+		}
 	}
 
 	// Get the requesting user.
@@ -310,7 +338,6 @@ func (h *Auth) ResetPasswordSubmit(ctx echo.Context) error {
 		Update().
 		SetPassword(input.Password).
 		Save(ctx.Request().Context())
-
 	if err != nil {
 		return fail(err, "unable to update password")
 	}
@@ -322,6 +349,7 @@ func (h *Auth) ResetPasswordSubmit(ctx echo.Context) error {
 	}
 
 	msg.Success(ctx, "Your password has been updated.")
+
 	return redirect.New(ctx).
 		Route(routenames.Login).
 		Go()
@@ -332,9 +360,11 @@ func (h *Auth) VerifyEmail(ctx echo.Context) error {
 
 	// Validate the token.
 	token := ctx.Param("token")
+
 	email, err := h.auth.ValidateEmailVerificationToken(token)
 	if err != nil {
 		msg.Warning(ctx, "The link is either invalid or has expired.")
+
 		return redirect.New(ctx).
 			Route(routenames.Home).
 			Go()
@@ -355,7 +385,6 @@ func (h *Auth) VerifyEmail(ctx echo.Context) error {
 			Query().
 			Where(user.Email(email)).
 			Only(ctx.Request().Context())
-
 		if err != nil {
 			return fail(err, "query failed loading email verification token user")
 		}
@@ -367,13 +396,13 @@ func (h *Auth) VerifyEmail(ctx echo.Context) error {
 			Update().
 			SetVerified(true).
 			Save(ctx.Request().Context())
-
 		if err != nil {
 			return fail(err, "failed to set user as verified")
 		}
 	}
 
 	msg.Success(ctx, "Your email has been successfully verified.")
+
 	return redirect.New(ctx).
 		Route(routenames.Home).
 		Go()

@@ -34,7 +34,8 @@ const (
 // currently running in.
 // This must be called prior to loading the configuration in order for it to take effect.
 func SwitchEnvironment(env environment) {
-	if err := os.Setenv("PAGODA_APP_ENVIRONMENT", string(env)); err != nil {
+	err := os.Setenv("PAGODA_APP_ENVIRONMENT", string(env))
+	if err != nil {
 		panic(err)
 	}
 }
@@ -135,11 +136,13 @@ func GetConfig() (Config, error) {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	if err := viper.ReadInConfig(); err != nil {
+	err := viper.ReadInConfig()
+	if err != nil {
 		return c, err
 	}
 
-	if err := viper.Unmarshal(&c); err != nil {
+	err = viper.Unmarshal(&c)
+	if err != nil {
 		return c, err
 	}
 

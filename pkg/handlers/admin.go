@@ -33,6 +33,7 @@ func init() {
 
 func (h *Admin) Init(c *services.Container) error {
 	var err error
+
 	h.orm = c.ORM
 	h.admin = admin.NewHandler(h.orm, admin.HandlerConfig{
 		ItemsPerPage: 25,
@@ -45,6 +46,7 @@ func (h *Admin) Init(c *services.Container) error {
 		ItemsPerPage: 25,
 		ReleaseAfter: c.Config.Tasks.ReleaseAfter,
 	})
+
 	return err
 }
 
@@ -53,7 +55,7 @@ func (h *Admin) Routes(g *echo.Group) {
 
 	entities := ag.Group("/entity")
 	for _, n := range admin.GetEntityTypes() {
-		ng := entities.Group(fmt.Sprintf("/%s", strings.ToLower(n.GetName())))
+		ng := entities.Group("/" + strings.ToLower(n.GetName()))
 		ng.GET("", h.EntityList(n)).
 			Name = routenames.AdminEntityList(n.GetName())
 		ng.GET("/add", h.EntityAdd(n)).
@@ -89,10 +91,12 @@ func (h *Admin) middlewareEntityLoad(n admin.EntityType) echo.MiddlewareFunc {
 			}
 
 			entity, err := h.admin.Get(ctx, n, id)
+
 			switch {
 			case err == nil:
 				ctx.Set(context.AdminEntityIDKey, id)
 				ctx.Set(context.AdminEntityKey, map[string][]string(entity))
+
 				return next(ctx)
 			case ent.IsNotFound(err):
 				return echo.NewHTTPError(http.StatusNotFound, "entity not found")
@@ -125,6 +129,7 @@ func (h *Admin) EntityAddSubmit(n admin.EntityType) echo.HandlerFunc {
 		err := h.admin.Create(ctx, n)
 		if err != nil {
 			msg.Error(ctx, err.Error())
+
 			return h.EntityAdd(n)(ctx)
 		}
 
@@ -141,6 +146,7 @@ func (h *Admin) EntityAddSubmit(n admin.EntityType) echo.HandlerFunc {
 func (h *Admin) EntityEdit(n admin.EntityType) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		v := ctx.Get(context.AdminEntityKey).(map[string][]string)
+
 		return pages.AdminEntityInput(ctx, n, v)
 	}
 }
@@ -148,9 +154,11 @@ func (h *Admin) EntityEdit(n admin.EntityType) echo.HandlerFunc {
 func (h *Admin) EntityEditSubmit(n admin.EntityType) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		id := ctx.Get(context.AdminEntityIDKey).(int)
+
 		err := h.admin.Update(ctx, n, id)
 		if err != nil {
 			msg.Error(ctx, err.Error())
+
 			return h.EntityEdit(n)(ctx)
 		}
 
@@ -173,8 +181,11 @@ func (h *Admin) EntityDelete(n admin.EntityType) echo.HandlerFunc {
 func (h *Admin) EntityDeleteSubmit(n admin.EntityType) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		id := ctx.Get(context.AdminEntityIDKey).(int)
-		if err := h.admin.Delete(ctx, n, id); err != nil {
+
+		err := h.admin.Delete(ctx, n, id)
+		if err != nil {
 			msg.Error(ctx, err.Error())
+
 			return h.EntityDelete(n)(ctx)
 		}
 
@@ -193,6 +204,7 @@ func (h *Admin) Backlite(handler func(http.ResponseWriter, *http.Request) error)
 		if id := c.Param("id"); id != "" {
 			c.Request().SetPathValue("task", id)
 		}
+
 		return handler(c.Response().Writer, c.Request())
 	}
 }

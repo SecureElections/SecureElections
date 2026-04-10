@@ -39,6 +39,7 @@ func BuildRouter(c *services.Container) error {
 						return false
 					}
 				}
+
 				return true
 			},
 		}),
@@ -82,7 +83,8 @@ func BuildRouter(c *services.Container) error {
 
 	// Initialize and register all handlers.
 	for _, h := range GetHandlers() {
-		if err := h.Init(c); err != nil {
+		err := h.Init(c)
+		if err != nil {
 			return err
 		}
 

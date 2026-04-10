@@ -29,7 +29,13 @@ func Metatags(r *ui.Request) Node {
 		Meta(Name("viewport"), Content("width=device-width, initial-scale=1")),
 		Link(Rel("icon"), Href(ui.StaticFile("favicon.png"))),
 		TitleEl(Text(r.Config.App.Name), If(r.Title != "", Text(" | "+r.Title))),
-		If(r.Metatags.Description != "", Meta(Name("description"), Content(r.Metatags.Description))),
-		If(len(r.Metatags.Keywords) > 0, Meta(Name("keywords"), Content(strings.Join(r.Metatags.Keywords, ", ")))),
+		If(
+			r.Metatags.Description != "",
+			Meta(Name("description"), Content(r.Metatags.Description)),
+		),
+		If(
+			len(r.Metatags.Keywords) > 0,
+			Meta(Name("keywords"), Content(strings.Join(r.Metatags.Keywords, ", "))),
+		),
 	}
 }
