@@ -6,7 +6,7 @@ require (
 	entgo.io/ent v0.14.6
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/go-playground/validator/v10 v10.29.0
-	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/context v1.1.2
 	github.com/gorilla/sessions v1.4.0
 	github.com/labstack/echo/v4 v4.14.0
