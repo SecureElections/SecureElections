@@ -44,16 +44,20 @@ func (PasswordToken) Hooks() []ent.Hook {
 	return []ent.Hook{
 		hook.On(
 			func(next ent.Mutator) ent.Mutator {
-				return hook.PasswordTokenFunc(func(ctx context.Context, m *ge.PasswordTokenMutation) (ent.Value, error) {
-					if v, exists := m.Token(); exists {
-						hash, err := bcrypt.GenerateFromPassword([]byte(v), bcrypt.DefaultCost)
-						if err != nil {
-							return "", err
+				return hook.PasswordTokenFunc(
+					func(ctx context.Context, m *ge.PasswordTokenMutation) (ent.Value, error) {
+						if v, exists := m.Token(); exists {
+							hash, err := bcrypt.GenerateFromPassword([]byte(v), bcrypt.DefaultCost)
+							if err != nil {
+								return "", err
+							}
+
+							m.SetToken(string(hash))
 						}
-						m.SetToken(string(hash))
-					}
-					return next.Mutate(ctx, m)
-				})
+
+						return next.Mutate(ctx, m)
+					},
+				)
 			},
 			// Limit the hook only for these operations.
 			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,

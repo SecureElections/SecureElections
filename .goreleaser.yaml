@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+project_name: SecureElections
+before:
+  hooks:
+    - just gen
+    - just css
+    - just format
+
+metadata:
+  mod_timestamp: "{{ .CommitTimestamp }}"
+
+builds:
+  - main: ./cmd/web/main.go
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - loong64
+      - ppc64
+      - riscv64
+
+nfpms:
+  - vendor: SecureElections
+    homepage: https://github.com/SecureElections/SecureElections
+    maintainer: Johannes Hoffmann
+    formats:
+      - apk
+      - deb
+      - rpm
+      - termux.deb
+      - archlinux
+    contents:
+      - src: config/config.yaml
+        dst: /etc/secureelections/config.yaml
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  use: github
+  format: "{{ .Message }}{{ if .Logins }} ({{ .Logins | englishJoin }}){{ end }}"
+  filters:
+    exclude:
+      - "^test:"
+      - "^test\\("
+      - "^chore\\("
+      - "^chore: schema update$"
+      - "^chore\\(deps\\): "
+      - "^(build|ci): "
+      - "^ci\\("
+      - "merge conflict"
+      - "merge conflict"
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    - title: "New Features"
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 100
+    - title: "Security updates"
+      regexp: '^.*?sec(\(.+\))??!?:.+$'
+      order: 150
+    - title: "Bug fixes"
+      regexp: '^.*?(fix|refactor)(\(.+\))??!?:.+$'
+      order: 200
+    - title: "Documentation updates"
+      regexp: ^.*?docs?(\(.+\))??!?:.+$
+      order: 400
+    - title: Other work
+      order: 9999
+
+dockers_v2:
+  - images:
+      - "secureelections/secureelections"
+      - "ghcr.io/secureelections/secureelections"
+    tags:
+      - "v{{ .Version }}"
+      - "v{{ .Major }}"
+      - "v{{ .Major }}.{{ .Minor }}"
+      - "{{ if .IsNightly }}nightly{{ end }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    dockerfile: Dockerfile
+    labels:
+      "io.artifacthub.package.readme-url": "https://raw.githubusercontent.com/secureelections/secureelections/main/README.md"
+      "org.opencontainers.image.created": "{{.Date}}"
+      "org.opencontainers.image.name": "{{.ProjectName}}"
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
+      "org.opencontainers.image.source": "{{.GitURL}}"
+    extra_files:
+      - config/config.yaml
+    platforms:
+      - "linux/amd64"
+      - "linux/arm64"
+      - "linux/riscv64"
+
+docker_digest:
+  name_template: "digests.txt"
+
+release:
+  name_template: "v{{ .Version }}"
+  draft: true
+  replace_existing_draft: true
+  replace_existing_artifacts: true
+  prerelease: auto

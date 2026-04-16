@@ -1,6 +1,7 @@
 package form
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -27,13 +28,19 @@ func (f *Submission) Submit(ctx echo.Context, form any) error {
 	ctx.Set(context.FormKey, form)
 
 	// Bind the values from the incoming request to the form struct.
-	if err := ctx.Bind(form); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("unable to bind form: %v", err))
+	err := ctx.Bind(form)
+	if err != nil {
+		return echo.NewHTTPError(
+			http.StatusInternalServerError,
+			fmt.Sprintf("unable to bind form: %v", err),
+		)
 	}
 
 	// Validate the form.
-	if err := ctx.Validate(form); err != nil {
+	err = ctx.Validate(form)
+	if err != nil {
 		f.setErrorMessages(err)
+
 		return err
 	}
 
@@ -48,6 +55,7 @@ func (f *Submission) IsValid() bool {
 	if f.errors == nil {
 		return true
 	}
+
 	return len(f.errors) == 0
 }
 
@@ -63,6 +71,7 @@ func (f *Submission) SetFieldError(fieldName string, message string) {
 	if f.errors == nil {
 		f.errors = make(map[string][]string)
 	}
+
 	f.errors[fieldName] = append(f.errors[fieldName], message)
 }
 
@@ -70,13 +79,16 @@ func (f *Submission) GetFieldErrors(fieldName string) []string {
 	if f.errors == nil {
 		return []string{}
 	}
+
 	return f.errors[fieldName]
 }
 
 // setErrorMessages sets errors messages on the submission for all fields that failed validation.
 func (f *Submission) setErrorMessages(err error) {
 	// Only this is supported right now
-	ves, ok := err.(validator.ValidationErrors)
+	var ves validator.ValidationErrors
+
+	ok := errors.As(err, &ves)
 	if !ok {
 		return
 	}

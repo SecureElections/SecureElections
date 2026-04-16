@@ -9,7 +9,7 @@ import (
 )
 
 // Simple example of how to test routes and their markup using the test HTTP server spun up within
-// this test package
+// this test package.
 func TestPages__About(t *testing.T) {
 	doc := request(t).
 		setRoute(routenames.About).

@@ -1,8 +1,8 @@
 package pages
 
 import (
-	"fmt"
 	"net/url"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mikestefanello/pagoda/ent/admin"
@@ -17,7 +17,7 @@ import (
 
 func AdminEntityDelete(ctx echo.Context, entityType admin.EntityType) error {
 	r := ui.NewRequest(ctx)
-	r.Title = fmt.Sprintf("Delete %s", entityType.GetName())
+	r.Title = "Delete " + entityType.GetName()
 
 	return r.Render(
 		layouts.Primary,
@@ -28,9 +28,9 @@ func AdminEntityDelete(ctx echo.Context, entityType admin.EntityType) error {
 func AdminEntityInput(ctx echo.Context, entityType admin.EntityType, values url.Values) error {
 	r := ui.NewRequest(ctx)
 	if values == nil {
-		r.Title = fmt.Sprintf("Add %s", entityType.GetName())
+		r.Title = "Add " + entityType.GetName()
 	} else {
-		r.Title = fmt.Sprintf("Edit %s", entityType.GetName())
+		r.Title = "Edit " + entityType.GetName()
 	}
 
 	return r.Render(
@@ -49,20 +49,27 @@ func AdminEntityList(
 
 	genHeader := func() Node {
 		g := make(Group, 0, len(entityList.Columns)+2)
+
 		g = append(g, Th(Text("ID")))
+
 		for _, h := range entityList.Columns {
 			g = append(g, Th(Text(h)))
 		}
+
 		g = append(g, Th())
+
 		return g
 	}
 
 	genRow := func(row admin.EntityValues) Node {
 		g := make(Group, 0, len(row.Values)+3)
-		g = append(g, Th(Text(fmt.Sprint(row.ID))))
+
+		g = append(g, Th(Text(strconv.Itoa(row.ID))))
+
 		for _, h := range row.Values {
 			g = append(g, Td(Text(h)))
 		}
+
 		g = append(g,
 			Td(
 				ButtonLink(
@@ -78,6 +85,7 @@ func AdminEntityList(
 				),
 			),
 		)
+
 		return g
 	}
 
@@ -86,6 +94,7 @@ func AdminEntityList(
 		for _, row := range entityList.Entities {
 			g = append(g, Tr(genRow(row)))
 		}
+
 		return g
 	}
 
@@ -95,7 +104,7 @@ func AdminEntityList(
 			ButtonLink(
 				ColorAccent,
 				r.Path(routenames.AdminEntityAdd(entityType.GetName())),
-				fmt.Sprintf("Add %s", entityType.GetName()),
+				"Add "+entityType.GetName(),
 			),
 		),
 		Table(

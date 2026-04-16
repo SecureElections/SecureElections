@@ -17,6 +17,7 @@ type mockForm struct {
 
 func (m *mockForm) Submit(_ echo.Context, _ any) error {
 	m.called = true
+
 	return nil
 }
 

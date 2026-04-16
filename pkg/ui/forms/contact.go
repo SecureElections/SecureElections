@@ -12,9 +12,9 @@ import (
 )
 
 type Contact struct {
-	Email      string `form:"email" validate:"required,email"`
+	Email      string `form:"email"      validate:"required,email"`
 	Department string `form:"department" validate:"required,oneof=sales marketing hr"`
-	Message    string `form:"message" validate:"required"`
+	Message    string `form:"message"    validate:"required"`
 	form.Submission
 }
 

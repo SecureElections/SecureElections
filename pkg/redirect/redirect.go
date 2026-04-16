@@ -20,7 +20,7 @@ type Redirect struct {
 	query       url.Values
 }
 
-// New initializes a new Redirect
+// New initializes a new Redirect.
 func New(ctx echo.Context) *Redirect {
 	return &Redirect{
 		ctx:    ctx,
@@ -29,15 +29,17 @@ func New(ctx echo.Context) *Redirect {
 }
 
 // Route sets the route name to redirect to.
-// Use either this or URL()
+// Use either this or URL().
 func (r *Redirect) Route(name string) *Redirect {
 	r.routeName = name
+
 	return r
 }
 
-// Params sets the route params
+// Params sets the route params.
 func (r *Redirect) Params(params ...any) *Redirect {
 	r.routeParams = params
+
 	return r
 }
 
@@ -45,24 +47,27 @@ func (r *Redirect) Params(params ...any) *Redirect {
 // Does not apply to HTMX redirects.
 func (r *Redirect) StatusCode(code int) *Redirect {
 	r.status = code
+
 	return r
 }
 
-// Query sets a URL query
+// Query sets a URL query.
 func (r *Redirect) Query(query url.Values) *Redirect {
 	r.query = query
+
 	return r
 }
 
 // URL sets the URL to redirect to
-// Use either this or Route()
+// Use either this or Route().
 func (r *Redirect) URL(url string) *Redirect {
 	r.url = url
+
 	return r
 }
 
 // Go performs the redirect
-// If the request is HTMX boosted, an HTMX redirect will be performed instead of an HTTP redirect
+// If the request is HTMX boosted, an HTMX redirect will be performed instead of an HTTP redirect.
 func (r *Redirect) Go() error {
 	if r.routeName == "" && r.url == "" {
 		return errors.New("no redirect provided")

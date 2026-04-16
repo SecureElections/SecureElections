@@ -18,7 +18,11 @@ func AddTask(ctx echo.Context, form *forms.Task) error {
 	g := Group{
 		Iff(r.Htmx.Target != "task", func() Node {
 			return Group{
-				P(Raw("Submitting this form will create an <i>ExampleTask</i> in the task queue. After the specified delay, the message will be logged by the queue processor.")),
+				P(
+					Raw(
+						"Submitting this form will create an <i>ExampleTask</i> in the task queue. After the specified delay, the message will be logged by the queue processor.",
+					),
+				),
 				P(Raw("See <i>pkg/tasks</i> and the README for more information.")),
 			}
 		}),
@@ -30,6 +34,7 @@ func AddTask(ctx echo.Context, form *forms.Task) error {
 			} else {
 				text = "Log in as an admin in order to access the task and queue monitoring UI."
 			}
+
 			return Group{
 				Div(Class("mt-5")),
 				Alert(ColorWarning, text),

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 
 	entsql "entgo.io/ent/dialect/sql"
@@ -69,6 +70,7 @@ func NewContainer() *Container {
 	c.initAuth()
 	c.initMail()
 	c.initTasks()
+
 	return c
 }
 
@@ -77,22 +79,27 @@ func (c *Container) Shutdown() error {
 	// Shutdown the web server.
 	webCtx, webCancel := context.WithTimeout(context.Background(), c.Config.HTTP.ShutdownTimeout)
 	defer webCancel()
-	if err := c.Web.Shutdown(webCtx); err != nil {
+
+	err := c.Web.Shutdown(webCtx)
+	if err != nil {
 		return err
 	}
 
 	// Shutdown the task runner.
 	taskCtx, taskCancel := context.WithTimeout(context.Background(), c.Config.Tasks.ShutdownTimeout)
 	defer taskCancel()
+
 	c.Tasks.Stop(taskCtx)
 
 	// Shutdown the ORM.
-	if err := c.ORM.Close(); err != nil {
+	err = c.ORM.Close()
+	if err != nil {
 		return err
 	}
 
 	// Shutdown the database.
-	if err := c.Database.Close(); err != nil {
+	err = c.Database.Close()
+	if err != nil {
 		return err
 	}
 
@@ -108,6 +115,7 @@ func (c *Container) initConfig() {
 	if err != nil {
 		panic(fmt.Sprintf("failed to load config: %v", err))
 	}
+
 	c.Config = &cfg
 
 	// Configure logging.
@@ -143,8 +151,10 @@ func (c *Container) initCache() {
 
 // initDatabase initializes the database.
 func (c *Container) initDatabase() {
-	var err error
-	var connection string
+	var (
+		err        error
+		connection string
+	)
 
 	switch c.Config.App.Environment {
 	case config.EnvTest:
@@ -165,13 +175,17 @@ func (c *Container) initFiles() {
 	// Use in-memory storage for tests.
 	if c.Config.App.Environment == config.EnvTest {
 		c.Files = afero.NewMemMapFs()
+
 		return
 	}
 
 	fs := afero.NewOsFs()
-	if err := fs.MkdirAll(c.Config.Files.Directory, 0755); err != nil {
+
+	err := fs.MkdirAll(c.Config.Files.Directory, 0o755)
+	if err != nil {
 		panic(err)
 	}
+
 	c.Files = afero.NewBasePathFs(fs, c.Config.Files.Directory)
 }
 
@@ -181,7 +195,8 @@ func (c *Container) initORM() {
 	c.ORM = ent.NewClient(ent.Driver(drv))
 
 	// Run the auto migration tool.
-	if err := c.ORM.Schema.Create(context.Background()); err != nil {
+	err := c.ORM.Schema.Create(context.Background())
+	if err != nil {
 		panic(err)
 	}
 }
@@ -194,6 +209,7 @@ func (c *Container) initAuth() {
 // initMail initialize the mail client.
 func (c *Container) initMail() {
 	var err error
+
 	c.Mail, err = NewMailClient(c.Config)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create mail client: %v", err))
@@ -212,7 +228,6 @@ func (c *Container) initTasks() {
 		ReleaseAfter:    c.Config.Tasks.ReleaseAfter,
 		CleanupInterval: c.Config.Tasks.CleanupInterval,
 	})
-
 	if err != nil {
 		panic(fmt.Sprintf("failed to create task client: %v", err))
 	}
@@ -231,14 +246,15 @@ func openDB(driver, connection string) (*sql.DB, error) {
 		if len(d) > 1 {
 			dirpath := strings.Join(d[:len(d)-1], "/")
 
-			if err := os.MkdirAll(dirpath, 0755); err != nil {
+			err := os.MkdirAll(dirpath, 0o755)
+			if err != nil {
 				return nil, err
 			}
 		}
 
 		// Check if a random value is required, which is often used for in-memory test databases.
 		if strings.Contains(connection, "$RAND") {
-			connection = strings.Replace(connection, "$RAND", fmt.Sprint(rand.Int()), 1)
+			connection = strings.Replace(connection, "$RAND", strconv.Itoa(rand.Int()), 1)
 		}
 	}
 
