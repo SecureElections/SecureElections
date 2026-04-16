@@ -1,4 +1,4 @@
-# Welcome to SecureElections.
+# Welcome to SecureElections.[^1]
 
 ### <ins>We aim to provide secure and reliable software for goverment elections of all sizes</ins>.<br/>
 -Government elections have weak Points during the transmission of Data.
@@ -15,7 +15,7 @@
 - You can run our system on any self-hosted platform.<br/>
 - Clear text passwords are being prevented.<br/>
 
-## <ins>We will not host platforms for you.</ins> [^1]
+## <ins>We will not host platforms for you.</ins>
 <br/><br/><br/>
 
 [^1]: How to run your own plattform.
