@@ -55,6 +55,7 @@ func AdminEntity(r *ui.Request, entityType admin.EntityType, values url.Values) 
 					p.Help = "SENSITIVE: This field will only be updated if a value is provided."
 				}
 			}
+
 			nodes = append(nodes, InputField(p))
 
 		case field.TypeTime:
@@ -90,12 +91,14 @@ func AdminEntity(r *ui.Request, entityType admin.EntityType, values url.Values) 
 					Value: "",
 				})
 			}
+
 			for _, enum := range f.Enums {
 				options = append(options, Choice{
 					Label: enum,
 					Value: enum,
 				})
 			}
+
 			nodes = append(nodes, SelectList(OptionsParams{
 				Name:    f.Name,
 				Label:   admin.FieldLabel(f.Name),

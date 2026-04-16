@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -20,17 +21,24 @@ func LoadAuthenticatedUser(authClient *services.AuthClient) echo.MiddlewareFunc 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			u, err := authClient.GetAuthenticatedUser(c)
-			switch err.(type) {
-			case *ent.NotFoundError:
-				log.Ctx(c).Warn("auth user not found")
-			case services.NotAuthenticatedError:
-			case nil:
-				c.Set(context.AuthenticatedUserKey, u)
-			default:
-				return echo.NewHTTPError(
-					http.StatusInternalServerError,
-					fmt.Sprintf("error querying for authenticated user: %v", err),
+			{
+				var (
+					errCase0 *ent.NotFoundError
+					errCase1 services.NotAuthenticatedError
 				)
+
+				switch {
+				case errors.As(err, &errCase0):
+					log.Ctx(c).Warn("auth user not found")
+				case errors.As(err, &errCase1):
+				case err == nil:
+					c.Set(context.AuthenticatedUserKey, u)
+				default:
+					return echo.NewHTTPError(
+						http.StatusInternalServerError,
+						fmt.Sprintf("error querying for authenticated user: %v", err),
+					)
+				}
 			}
 
 			return next(c)
@@ -49,6 +57,7 @@ func LoadValidPasswordToken(authClient *services.AuthClient) echo.MiddlewareFunc
 			if c.Get(context.UserKey) == nil {
 				return echo.NewHTTPError(http.StatusInternalServerError)
 			}
+
 			usr := c.Get(context.UserKey).(*ent.User)
 
 			// Extract the token ID.
@@ -65,18 +74,26 @@ func LoadValidPasswordToken(authClient *services.AuthClient) echo.MiddlewareFunc
 				c.Param("token"),
 			)
 
-			switch err.(type) {
-			case nil:
-				c.Set(context.PasswordTokenKey, token)
-				return next(c)
-			case services.InvalidPasswordTokenError:
-				msg.Warning(c, "The link is either invalid or has expired. Please request a new one.")
-				return c.Redirect(http.StatusFound, c.Echo().Reverse(routenames.ForgotPassword))
-			default:
-				return echo.NewHTTPError(
-					http.StatusInternalServerError,
-					fmt.Sprintf("error loading password token: %v", err),
-				)
+			{
+				var errCase0 services.InvalidPasswordTokenError
+				switch {
+				case err == nil:
+					c.Set(context.PasswordTokenKey, token)
+
+					return next(c)
+				case errors.As(err, &errCase0):
+					msg.Warning(
+						c,
+						"The link is either invalid or has expired. Please request a new one.",
+					)
+
+					return c.Redirect(http.StatusFound, c.Echo().Reverse(routenames.ForgotPassword))
+				default:
+					return echo.NewHTTPError(
+						http.StatusInternalServerError,
+						fmt.Sprintf("error loading password token: %v", err),
+					)
+				}
 			}
 		}
 	}

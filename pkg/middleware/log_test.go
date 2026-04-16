@@ -28,6 +28,7 @@ func (m *mockLogHandler) Enabled(_ context.Context, l slog.Level) bool {
 func (m *mockLogHandler) Handle(_ context.Context, r slog.Record) error {
 	m.level = r.Level.String()
 	m.msg = r.Message
+
 	return nil
 }
 
@@ -35,12 +36,15 @@ func (m *mockLogHandler) WithAttrs(as []slog.Attr) slog.Handler {
 	if m.attr == nil {
 		m.attr = make([]slog.Attr, 0)
 	}
+
 	m.attr = append(m.attr, as...)
+
 	return m
 }
 
 func (m *mockLogHandler) WithGroup(name string) slog.Handler {
 	m.group = name
+
 	return m
 }
 
@@ -48,6 +52,7 @@ func (m *mockLogHandler) GetAttr(key string) string {
 	if m.attr == nil {
 		return ""
 	}
+
 	for _, attr := range m.attr {
 		if attr.Key == key {
 			return attr.Value.String()
@@ -104,6 +109,7 @@ func TestLogRequest(t *testing.T) {
 	assert.Equal(t, "GET /abc?d=1&e=2", h.msg)
 
 	statusCode = 500
+
 	exec()
 	assert.Equal(t, "ERROR", h.level)
 }

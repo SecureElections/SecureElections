@@ -23,13 +23,14 @@ func SetLogger() echo.MiddlewareFunc {
 
 			// TODO include other fields you may want in all logs for this request
 			log.Set(ctx, logger)
+
 			return next(ctx)
 		}
 	}
 }
 
 // LogRequest logs the current request
-// Echo provides middleware similar to this, but we want to use our own logger
+// Echo provides middleware similar to this, but we want to use our own logger.
 func LogRequest() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) (err error) {
@@ -38,9 +39,11 @@ func LogRequest() echo.MiddlewareFunc {
 
 			// Track how long the request takes to complete
 			start := time.Now()
+
 			if err = next(ctx); err != nil {
 				ctx.Error(err)
 			}
+
 			stop := time.Now()
 
 			sub := log.Ctx(ctx).With(
@@ -53,6 +56,7 @@ func LogRequest() echo.MiddlewareFunc {
 					if cl == "" {
 						cl = "0"
 					}
+
 					return cl
 				}(),
 				"bytes_out", strconv.FormatInt(res.Size, 10),

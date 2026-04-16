@@ -1,8 +1,8 @@
 package forms
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/mikestefanello/pagoda/pkg/form"
 	"github.com/mikestefanello/pagoda/pkg/routenames"
@@ -13,7 +13,7 @@ import (
 )
 
 type Task struct {
-	Delay   int    `form:"delay" validate:"gte=0"`
+	Delay   int    `form:"delay"   validate:"gte=0"`
 	Message string `form:"message" validate:"required"`
 	form.Submission
 }
@@ -31,7 +31,7 @@ func (f *Task) Render(r *ui.Request) Node {
 			InputType: "number",
 			Label:     "Delay (in seconds)",
 			Help:      "How long to wait until the task is executed",
-			Value:     fmt.Sprint(f.Delay),
+			Value:     strconv.Itoa(f.Delay),
 		}),
 		TextareaField(TextareaFieldParams{
 			Form:      f,

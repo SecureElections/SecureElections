@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -18,12 +19,15 @@ func (e *Error) Page(err error, ctx echo.Context) {
 
 	// Determine the error status code.
 	code := http.StatusInternalServerError
-	if he, ok := err.(*echo.HTTPError); ok {
+
+	he := &echo.HTTPError{}
+	if errors.As(err, &he) {
 		code = he.Code
 	}
 
 	// Log the error.
 	logger := log.Ctx(ctx)
+
 	switch {
 	case code >= 500:
 		logger.Error(err.Error())

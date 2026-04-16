@@ -20,6 +20,7 @@ func TestRedirect(t *testing.T) {
 
 	redirect := func() (*Redirect, echo.Context) {
 		ctx, _ := tests.NewContext(e, "/")
+
 		return New(ctx), ctx
 	}
 
@@ -27,13 +28,18 @@ func TestRedirect(t *testing.T) {
 		q := url.Values{}
 		q.Add("a", "1")
 		q.Add("b", "2")
+
 		r, ctx := redirect()
 		r.Route("test")
 		r.Params("one", "two")
 		r.Query(q)
 		r.StatusCode(http.StatusTemporaryRedirect)
 		require.NoError(t, r.Go())
-		assert.Equal(t, "/path/one/and/two?a=1&b=2", ctx.Response().Header().Get(echo.HeaderLocation))
+		assert.Equal(
+			t,
+			"/path/one/and/two?a=1&b=2",
+			ctx.Response().Header().Get(echo.HeaderLocation),
+		)
 		assert.Equal(t, http.StatusTemporaryRedirect, ctx.Response().Status)
 	})
 
@@ -41,25 +47,35 @@ func TestRedirect(t *testing.T) {
 		q := url.Values{}
 		q.Add("a", "1")
 		q.Add("b", "2")
+
 		r, ctx := redirect()
 		ctx.Request().Header.Set(htmx.HeaderBoosted, "true")
 		r.Route("test")
 		r.Params("one", "two")
 		r.Query(q)
 		require.NoError(t, r.Go())
-		assert.Equal(t, "/path/one/and/two?a=1&b=2", ctx.Response().Header().Get(htmx.HeaderRedirect))
+		assert.Equal(
+			t,
+			"/path/one/and/two?a=1&b=2",
+			ctx.Response().Header().Get(htmx.HeaderRedirect),
+		)
 	})
 
 	t.Run("url", func(t *testing.T) {
 		q := url.Values{}
 		q.Add("a", "1")
 		q.Add("b", "2")
+
 		r, ctx := redirect()
 		r.URL("https://localhost.dev")
 		r.Query(q)
 		r.StatusCode(http.StatusTemporaryRedirect)
 		require.NoError(t, r.Go())
-		assert.Equal(t, "https://localhost.dev?a=1&b=2", ctx.Response().Header().Get(echo.HeaderLocation))
+		assert.Equal(
+			t,
+			"https://localhost.dev?a=1&b=2",
+			ctx.Response().Header().Get(echo.HeaderLocation),
+		)
 		assert.Equal(t, http.StatusTemporaryRedirect, ctx.Response().Status)
 	})
 
@@ -67,11 +83,16 @@ func TestRedirect(t *testing.T) {
 		q := url.Values{}
 		q.Add("a", "1")
 		q.Add("b", "2")
+
 		r, ctx := redirect()
 		ctx.Request().Header.Set(htmx.HeaderBoosted, "true")
 		r.URL("https://localhost.dev")
 		r.Query(q)
 		require.NoError(t, r.Go())
-		assert.Equal(t, "https://localhost.dev?a=1&b=2", ctx.Response().Header().Get(htmx.HeaderRedirect))
+		assert.Equal(
+			t,
+			"https://localhost.dev?a=1&b=2",
+			ctx.Response().Header().Get(htmx.HeaderRedirect),
+		)
 	})
 }

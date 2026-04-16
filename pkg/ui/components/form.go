@@ -81,6 +81,7 @@ func TextareaField(el TextareaFieldParams) Node {
 
 func Radios(el OptionsParams) Node {
 	buttons := make(Group, len(el.Options))
+
 	for i, opt := range el.Options {
 		id := "radio-" + el.Name + "-" + opt.Value
 		buttons[i] = Div(

@@ -30,6 +30,7 @@ func (User) Fields() []ent.Field {
 			Unique().
 			Validate(func(s string) error {
 				_, err := mail.ParseAddress(s)
+
 				return err
 			}),
 		field.String("password").
@@ -58,20 +59,24 @@ func (User) Hooks() []ent.Hook {
 	return []ent.Hook{
 		hook.On(
 			func(next ent.Mutator) ent.Mutator {
-				return hook.UserFunc(func(ctx context.Context, m *ge.UserMutation) (ent.Value, error) {
-					if v, exists := m.Email(); exists {
-						m.SetEmail(strings.ToLower(v))
-					}
-
-					if v, exists := m.Password(); exists {
-						hash, err := bcrypt.GenerateFromPassword([]byte(v), bcrypt.DefaultCost)
-						if err != nil {
-							return "", err
+				return hook.UserFunc(
+					func(ctx context.Context, m *ge.UserMutation) (ent.Value, error) {
+						if v, exists := m.Email(); exists {
+							m.SetEmail(strings.ToLower(v))
 						}
-						m.SetPassword(string(hash))
-					}
-					return next.Mutate(ctx, m)
-				})
+
+						if v, exists := m.Password(); exists {
+							hash, err := bcrypt.GenerateFromPassword([]byte(v), bcrypt.DefaultCost)
+							if err != nil {
+								return "", err
+							}
+
+							m.SetPassword(string(hash))
+						}
+
+						return next.Mutate(ctx, m)
+					},
+				)
 			},
 			// Limit the hook only for these operations.
 			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
