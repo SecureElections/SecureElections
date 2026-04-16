@@ -39,7 +39,9 @@ func Get[T any](ctx echo.Context) *T {
 			return form
 		}
 	}
+
 	var v T
+
 	return &v
 }
 

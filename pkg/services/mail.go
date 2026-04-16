@@ -66,7 +66,9 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 		// Render the component and use as the body.
 		// TODO pool the buffers?
 		buf := bytes.NewBuffer(nil)
-		if err := email.component.Render(buf); err != nil {
+
+		err := email.component.Render(buf)
+		if err != nil {
 			return err
 		}
 
@@ -78,6 +80,7 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 		log.Ctx(ctx).Debug("skipping email delivery",
 			"to", email.to,
 		)
+
 		return nil
 	}
 
@@ -87,24 +90,28 @@ func (m *MailClient) send(email *mail, ctx echo.Context) error {
 		"subject", email.subject,
 		"body", email.body,
 	)
+
 	return nil
 }
 
 // From sets the email from address.
 func (m *mail) From(from string) *mail {
 	m.from = from
+
 	return m
 }
 
 // To sets the email address this email will be sent to.
 func (m *mail) To(to string) *mail {
 	m.to = to
+
 	return m
 }
 
 // Subject sets the subject line of the email.
 func (m *mail) Subject(subject string) *mail {
 	m.subject = subject
+
 	return m
 }
 
@@ -112,12 +119,14 @@ func (m *mail) Subject(subject string) *mail {
 // This is not required and will be ignored if a component is set via Component().
 func (m *mail) Body(body string) *mail {
 	m.body = body
+
 	return m
 }
 
 // Component sets a renderable component to use as the body of the email.
 func (m *mail) Component(component gomponents.Node) *mail {
 	m.component = component
+
 	return m
 }
 

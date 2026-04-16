@@ -56,7 +56,9 @@ func Cache[T any](ctx echo.Context, key string, gen func(echo.Context) T) T {
 			return v
 		}
 	}
+
 	val := gen(ctx)
 	ctx.Set(key, val)
+
 	return val
 }

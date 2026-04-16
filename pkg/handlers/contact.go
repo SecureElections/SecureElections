@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -22,6 +22,7 @@ func init() {
 
 func (h *Contact) Init(c *services.Container) error {
 	h.mail = c.Mail
+
 	return nil
 }
 
@@ -39,21 +40,23 @@ func (h *Contact) Submit(ctx echo.Context) error {
 
 	err := form.Submit(ctx, &input)
 
-	switch err.(type) {
-	case nil:
-	case validator.ValidationErrors:
-		return h.Page(ctx)
-	default:
-		return err
+	{
+		var errCase0 validator.ValidationErrors
+		switch {
+		case err == nil:
+		case errors.As(err, &errCase0):
+			return h.Page(ctx)
+		default:
+			return err
+		}
 	}
 
 	err = h.mail.
 		Compose().
 		To(input.Email).
 		Subject("Contact form submitted").
-		Body(fmt.Sprintf("The message is: %s", input.Message)).
+		Body("The message is: " + input.Message).
 		Send(ctx)
-
 	if err != nil {
 		return fail(err, "unable to send email")
 	}

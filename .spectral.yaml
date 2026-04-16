@@ -1,0 +1,16 @@
+extends:
+  - [spectral:oas, all]
+  - ./openapi/spectral/digitalocean.yaml
+  - ./openapi/spectral/adidas.yaml
+  - "@apisyouwonthate/style-guide"
+
+formats: [oas3]
+
+functionsDir: ./openapi/spectral/functions
+
+rules:
+  oas3-operation-security-scopes-defined: warn
+  oas3-operation-security-defined: warn
+  hosts-https-only-oas3: warn
+  no-x-response-headers: warn
+  no-http-basic: warn

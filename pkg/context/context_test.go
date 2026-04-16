@@ -32,6 +32,7 @@ func TestCache(t *testing.T) {
 	called := 0
 	callback := func(ctx echo.Context) string {
 		called++
+
 		return value
 	}
 

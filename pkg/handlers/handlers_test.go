@@ -12,9 +12,12 @@ import (
 
 func TestGetSetHandlers(t *testing.T) {
 	handlers = []Handler{}
+
 	assert.Empty(t, GetHandlers())
+
 	h := new(Pages)
 	Register(h)
+
 	got := GetHandlers()
 	require.Len(t, got, 1)
 	assert.Equal(t, h, got[0])
@@ -23,7 +26,13 @@ func TestGetSetHandlers(t *testing.T) {
 func TestFail(t *testing.T) {
 	err := fail(errors.New("err message"), "log message")
 	require.IsType(t, new(echo.HTTPError), err)
-	he := err.(*echo.HTTPError)
+
+	he := func() *echo.HTTPError {
+		target := &echo.HTTPError{}
+		_ = errors.As(err, &target)
+
+		return target
+	}()
 	assert.Equal(t, http.StatusInternalServerError, he.Code)
 	assert.Equal(t, "log message: err message", he.Message)
 }
