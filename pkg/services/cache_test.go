@@ -34,6 +34,7 @@ func TestCacheClient(t *testing.T) {
 		Key(key).
 		Fetch(context.Background())
 	require.NoError(t, err)
+
 	cast, ok := fromCache.(cacheTest)
 	require.True(t, ok)
 	assert.Equal(t, data, cast)

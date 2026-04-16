@@ -21,7 +21,11 @@ func UploadFile(ctx echo.Context, files []*models.File) error {
 	}
 
 	n := Group{
-		P(Text("This is a very basic example of how to handle file uploads. Files uploaded will be saved to the directory specified in your configuration.")),
+		P(
+			Text(
+				"This is a very basic example of how to handle file uploads. Files uploaded will be saved to the directory specified in your configuration.",
+			),
+		),
 		Divider(""),
 		forms.File{}.Render(r),
 		Divider(""),

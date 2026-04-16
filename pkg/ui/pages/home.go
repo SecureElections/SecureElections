@@ -43,6 +43,7 @@ func Home(ctx echo.Context, posts *models.Posts) error {
 						if r.IsAuth {
 							return r.AuthUser.Name
 						}
+
 						return "(not logged in)"
 					}(),
 					Description: "The logged in user's name",
@@ -54,6 +55,7 @@ func Home(ctx echo.Context, posts *models.Posts) error {
 						if r.IsAdmin {
 							return "Administrator"
 						}
+
 						return "Non-administrator"
 					}(),
 					Description: "Use `make admin` to create an admin account",
@@ -77,8 +79,12 @@ func Home(ctx echo.Context, posts *models.Posts) error {
 			Card(CardParams{
 				Title: "Serving files",
 				Body: Group{
-					Text("In the example posts above, check how the file URL contains a cache-buster query parameter which changes only when the app is restarted. "),
-					Text("Static files also contain cache-control headers which are configured via middleware."),
+					Text(
+						"In the example posts above, check how the file URL contains a cache-buster query parameter which changes only when the app is restarted. ",
+					),
+					Text(
+						"Static files also contain cache-control headers which are configured via middleware.",
+					),
 				},
 				Color: ColorWarning,
 				Size:  SizeSmall,
@@ -86,10 +92,16 @@ func Home(ctx echo.Context, posts *models.Posts) error {
 			Card(CardParams{
 				Title: "Documentation",
 				Body: Group{
-					Text("Have you read through the entire documentation? If not, you may be missing functionality or have questions. "),
+					Text(
+						"Have you read through the entire documentation? If not, you may be missing functionality or have questions. ",
+					),
 				},
 				Footer: Group{
-					ButtonLink(ColorNeutral, "https://github.com/mikestefanello/pagoda?tab=readme-ov-file#table-of-contents", "Learn more"),
+					ButtonLink(
+						ColorNeutral,
+						"https://github.com/mikestefanello/pagoda?tab=readme-ov-file#table-of-contents",
+						"Learn more",
+					),
 				},
 				Color: ColorNeutral,
 				Size:  SizeSmall,

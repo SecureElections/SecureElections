@@ -2,8 +2,8 @@ package middleware
 
 import (
 	goctx "context"
-	"fmt"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/mikestefanello/pagoda/ent"
@@ -18,6 +18,7 @@ import (
 func TestLoadAuthenticatedUser(t *testing.T) {
 	ctx, _ := tests.NewContext(c.Web, "/")
 	tests.InitSession(ctx)
+
 	mw := LoadAuthenticatedUser(c.Auth)
 
 	// Not authenticated
@@ -47,11 +48,12 @@ func TestRequireAuthentication(t *testing.T) {
 	// Login
 	err = c.Auth.Login(ctx, usr.ID)
 	require.NoError(t, err)
+
 	_ = tests.ExecuteMiddleware(ctx, LoadAuthenticatedUser(c.Auth))
 
 	// Logged in
 	err = tests.ExecuteMiddleware(ctx, RequireAuthentication)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestRequireNoAuthentication(t *testing.T) {
@@ -60,11 +62,12 @@ func TestRequireNoAuthentication(t *testing.T) {
 
 	// Not logged in
 	err := tests.ExecuteMiddleware(ctx, RequireNoAuthentication)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Login
 	err = c.Auth.Login(ctx, usr.ID)
 	require.NoError(t, err)
+
 	_ = tests.ExecuteMiddleware(ctx, LoadAuthenticatedUser(c.Auth))
 
 	// Logged in
@@ -82,7 +85,7 @@ func TestLoadValidPasswordToken(t *testing.T) {
 
 	// Add user and password token context but no token and expect a redirect
 	ctx.SetParamNames("user", "password_token")
-	ctx.SetParamValues(fmt.Sprintf("%d", usr.ID), "1")
+	ctx.SetParamValues(strconv.Itoa(usr.ID), "1")
 	_ = tests.ExecuteMiddleware(ctx, LoadUser(c.ORM))
 	err = tests.ExecuteMiddleware(ctx, LoadValidPasswordToken(c.Auth))
 	assert.NoError(t, err)
@@ -90,7 +93,7 @@ func TestLoadValidPasswordToken(t *testing.T) {
 
 	// Add user context and invalid password token and expect a redirect
 	ctx.SetParamNames("user", "password_token", "token")
-	ctx.SetParamValues(fmt.Sprintf("%d", usr.ID), "1", "faketoken")
+	ctx.SetParamValues(strconv.Itoa(usr.ID), "1", "faketoken")
 	_ = tests.ExecuteMiddleware(ctx, LoadUser(c.ORM))
 	err = tests.ExecuteMiddleware(ctx, LoadValidPasswordToken(c.Auth))
 	assert.NoError(t, err)
@@ -102,10 +105,11 @@ func TestLoadValidPasswordToken(t *testing.T) {
 
 	// Add user and valid password token
 	ctx.SetParamNames("user", "password_token", "token")
-	ctx.SetParamValues(fmt.Sprintf("%d", usr.ID), fmt.Sprintf("%d", pt.ID), token)
+	ctx.SetParamValues(strconv.Itoa(usr.ID), strconv.Itoa(pt.ID), token)
 	_ = tests.ExecuteMiddleware(ctx, LoadUser(c.ORM))
 	err = tests.ExecuteMiddleware(ctx, LoadValidPasswordToken(c.Auth))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
+
 	ctxPt, ok := ctx.Get(context.PasswordTokenKey).(*ent.PasswordToken)
 	require.True(t, ok)
 	assert.Equal(t, pt.ID, ctxPt.ID)
@@ -122,6 +126,7 @@ func TestRequireAdmin(t *testing.T) {
 	// Login as a non-admin
 	err = c.Auth.Login(ctx, usr.ID)
 	require.NoError(t, err)
+
 	_ = tests.ExecuteMiddleware(ctx, LoadAuthenticatedUser(c.Auth))
 
 	// Logged in as a non-admin
@@ -137,9 +142,10 @@ func TestRequireAdmin(t *testing.T) {
 	require.NoError(t, err)
 	err = c.Auth.Login(ctx, adm.ID)
 	require.NoError(t, err)
+
 	_ = tests.ExecuteMiddleware(ctx, LoadAuthenticatedUser(c.Auth))
 
 	// Logged in as an admin
 	err = tests.ExecuteMiddleware(ctx, RequireAdmin)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }

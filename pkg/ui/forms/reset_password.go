@@ -11,7 +11,7 @@ import (
 )
 
 type ResetPassword struct {
-	Password        string `form:"password" validate:"required"`
+	Password        string `form:"password"         validate:"required"`
 	ConfirmPassword string `form:"password-confirm" validate:"required,eqfield=Password"`
 	form.Submission
 }

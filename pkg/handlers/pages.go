@@ -38,15 +38,20 @@ func (h *Pages) Home(ctx echo.Context) error {
 // fetchPosts is a mock example of fetching posts to illustrate how paging works.
 func (h *Pages) fetchPosts(pager *pager.Pager) []models.Post {
 	pager.SetItems(20)
+
 	posts := make([]models.Post, 20)
 
 	for k := range posts {
 		posts[k] = models.Post{
 			ID:    k + 1,
 			Title: fmt.Sprintf("Post example #%d", k+1),
-			Body:  fmt.Sprintf("Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.", k+1),
+			Body: fmt.Sprintf(
+				"Lorem ipsum example #%d ddolor sit amet, consectetur adipiscing elit. Nam elementum vulputate tristique.",
+				k+1,
+			),
 		}
 	}
+
 	return posts[pager.GetOffset() : pager.GetOffset()+pager.ItemsPerPage]
 }
 

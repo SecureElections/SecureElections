@@ -25,8 +25,16 @@ func (f *Cache) Render(r *ui.Request) Node {
 		Card(CardParams{
 			Title: "Test the cache",
 			Body: Group{
-				Span(Text("This route handler shows how the default in-memory cache works. Try updating the value using the form below and see how it persists after you reload the page.")),
-				Span(Text("HTMX makes it easy to re-render the cached value after the form is submitted.")),
+				Span(
+					Text(
+						"This route handler shows how the default in-memory cache works. Try updating the value using the form below and see how it persists after you reload the page.",
+					),
+				),
+				Span(
+					Text(
+						"HTMX makes it easy to re-render the cached value after the form is submitted.",
+					),
+				),
 			},
 			Color: ColorInfo,
 			Size:  SizeMedium,

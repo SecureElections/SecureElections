@@ -30,18 +30,22 @@ func TestMain(m *testing.M) {
 	c = services.NewContainer()
 
 	// Start a test HTTP server
-	if err := BuildRouter(c); err != nil {
+	err := BuildRouter(c)
+	if err != nil {
 		panic(err)
 	}
+
 	srv = httptest.NewServer(c.Web)
 
 	// Run tests
 	exitVal := m.Run()
 
 	// Shutdown the container and test server
-	if err := c.Shutdown(); err != nil {
+	err = c.Shutdown()
+	if err != nil {
 		panic(err)
 	}
+
 	srv.Close()
 
 	os.Exit(exitVal)
@@ -64,21 +68,25 @@ func request(t *testing.T) *httpRequest {
 			Jar: jar,
 		},
 	}
+
 	return &r
 }
 
 func (h *httpRequest) setClient(client http.Client) *httpRequest {
 	h.client = client
+
 	return h
 }
 
 func (h *httpRequest) setRoute(route string, params ...any) *httpRequest {
 	h.route = srv.URL + c.Web.Reverse(route, params)
+
 	return h
 }
 
 func (h *httpRequest) setBody(body url.Values) *httpRequest {
 	h.body = body
+
 	return h
 }
 
@@ -89,6 +97,7 @@ func (h *httpRequest) get() *httpResponse {
 		t:        h.t,
 		Response: resp,
 	}
+
 	return &r
 }
 
@@ -111,21 +120,25 @@ func (h *httpRequest) post() *httpResponse {
 		t:        h.t,
 		Response: resp,
 	}
+
 	return &r
 }
 
 type httpResponse struct {
 	*http.Response
+
 	t *testing.T
 }
 
 func (h *httpResponse) assertStatusCode(code int) *httpResponse {
-	assert.Equal(h.t, code, h.Response.StatusCode)
+	assert.Equal(h.t, code, h.StatusCode)
+
 	return h
 }
 
 func (h *httpResponse) assertRedirect(t *testing.T, route string, params ...any) *httpResponse {
 	assert.Equal(t, c.Web.Reverse(route, params), h.Header.Get("Location"))
+
 	return h
 }
 
@@ -134,5 +147,6 @@ func (h *httpResponse) toDoc() *goquery.Document {
 	require.NoError(h.t, err)
 	err = h.Body.Close()
 	assert.NoError(h.t, err)
+
 	return doc
 }

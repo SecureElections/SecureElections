@@ -28,8 +28,9 @@ func (h *Search) Routes(g *echo.Group) {
 func (h *Search) Page(ctx echo.Context) error {
 	// Fake search results.
 	results := make([]*models.SearchResult, 0, 5)
+
 	if search := ctx.QueryParam("query"); search != "" {
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			title := "Lorem ipsum example ddolor sit amet"
 			index := rand.Intn(len(title))
 			title = title[:index] + search + title[index:]

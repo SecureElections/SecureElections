@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/mikestefanello/pagoda/ent"
@@ -15,7 +15,7 @@ import (
 func TestLoadUser(t *testing.T) {
 	ctx, _ := tests.NewContext(c.Web, "/")
 	ctx.SetParamNames("user")
-	ctx.SetParamValues(fmt.Sprintf("%d", usr.ID))
+	ctx.SetParamValues(strconv.Itoa(usr.ID))
 	_ = tests.ExecuteMiddleware(ctx, LoadUser(c.ORM))
 	ctxUsr, ok := ctx.Get(context.UserKey).(*ent.User)
 	require.True(t, ok)

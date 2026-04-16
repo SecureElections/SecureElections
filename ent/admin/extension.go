@@ -42,7 +42,7 @@ func fieldName(name string) string {
 	}
 
 	parts := strings.Split(name, "_")
-	for i := 0; i < len(parts); i++ {
+	for i := range parts {
 		if parts[i] == "id" {
 			parts[i] = "ID"
 		} else {
@@ -60,10 +60,11 @@ func FieldLabel(name string) string {
 	}
 
 	parts := strings.Split(name, "_")
-	for i := 0; i < len(parts); i++ {
+	for i := range parts {
 		if parts[i] == "id" {
 			parts[i] = "ID"
 		}
+
 		if i == 0 {
 			parts[i] = upperFirst(parts[i])
 		}
@@ -83,6 +84,7 @@ func fieldIsPointer(f *gen.Field) bool {
 		f.Nillable:
 		return true
 	}
+
 	return false
 }
 
@@ -91,7 +93,9 @@ func upperFirst(s string) string {
 	if len(s) == 0 {
 		return s
 	}
+
 	out := []rune(s)
 	out[0] = unicode.ToUpper(out[0])
+
 	return string(out)
 }

@@ -20,17 +20,17 @@ import (
 )
 
 const (
-	// authSessionName stores the name of the session which contains authentication data
+	// authSessionName stores the name of the session which contains authentication data.
 	authSessionName = "ua"
 
-	// authSessionKeyUserID stores the key used to store the user ID in the session
+	// authSessionKeyUserID stores the key used to store the user ID in the session.
 	authSessionKeyUserID = "user_id"
 
-	// authSessionKeyAuthenticated stores the key used to store the authentication status in the session
+	// authSessionKeyAuthenticated stores the key used to store the authentication status in the session.
 	authSessionKeyAuthenticated = "authenticated"
 )
 
-// NotAuthenticatedError is an error returned when a user is not authenticated
+// NotAuthenticatedError is an error returned when a user is not authenticated.
 type NotAuthenticatedError struct{}
 
 // Error implements the error interface.
@@ -38,7 +38,7 @@ func (e NotAuthenticatedError) Error() string {
 	return "user not authenticated"
 }
 
-// InvalidPasswordTokenError is an error returned when an invalid token is provided
+// InvalidPasswordTokenError is an error returned when an invalid token is provided.
 type InvalidPasswordTokenError struct{}
 
 // Error implements the error interface.
@@ -46,13 +46,13 @@ func (e InvalidPasswordTokenError) Error() string {
 	return "invalid password token"
 }
 
-// AuthClient is the client that handles authentication requests
+// AuthClient is the client that handles authentication requests.
 type AuthClient struct {
 	config *config.Config
 	orm    *ent.Client
 }
 
-// NewAuthClient creates a new authentication client
+// NewAuthClient creates a new authentication client.
 func NewAuthClient(cfg *config.Config, orm *ent.Client) *AuthClient {
 	return &AuthClient{
 		config: cfg,
@@ -60,28 +60,32 @@ func NewAuthClient(cfg *config.Config, orm *ent.Client) *AuthClient {
 	}
 }
 
-// Login logs in a user of a given ID
+// Login logs in a user of a given ID.
 func (c *AuthClient) Login(ctx echo.Context, userID int) error {
 	sess, err := session.Get(ctx, authSessionName)
 	if err != nil {
 		return err
 	}
+
 	sess.Values[authSessionKeyUserID] = userID
 	sess.Values[authSessionKeyAuthenticated] = true
+
 	return sess.Save(ctx.Request(), ctx.Response())
 }
 
-// Logout logs the requesting user out
+// Logout logs the requesting user out.
 func (c *AuthClient) Logout(ctx echo.Context) error {
 	sess, err := session.Get(ctx, authSessionName)
 	if err != nil {
 		return err
 	}
+
 	sess.Values[authSessionKeyAuthenticated] = false
+
 	return sess.Save(ctx.Request(), ctx.Response())
 }
 
-// GetAuthenticatedUserID returns the authenticated user's ID, if the user is logged in
+// GetAuthenticatedUserID returns the authenticated user's ID, if the user is logged in.
 func (c *AuthClient) GetAuthenticatedUserID(ctx echo.Context) (int, error) {
 	sess, err := session.Get(ctx, authSessionName)
 	if err != nil {
@@ -95,7 +99,7 @@ func (c *AuthClient) GetAuthenticatedUserID(ctx echo.Context) (int, error) {
 	return 0, NotAuthenticatedError{}
 }
 
-// GetAuthenticatedUser returns the authenticated user if the user is logged in
+// GetAuthenticatedUser returns the authenticated user if the user is logged in.
 func (c *AuthClient) GetAuthenticatedUser(ctx echo.Context) (*ent.User, error) {
 	if userID, err := c.GetAuthenticatedUserID(ctx); err == nil {
 		return c.orm.User.Query().
@@ -106,7 +110,7 @@ func (c *AuthClient) GetAuthenticatedUser(ctx echo.Context) (*ent.User, error) {
 	return nil, NotAuthenticatedError{}
 }
 
-// CheckPassword check if a given password matches a given hash
+// CheckPassword check if a given password matches a given hash.
 func (c *AuthClient) CheckPassword(password, hash string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
@@ -115,7 +119,10 @@ func (c *AuthClient) CheckPassword(password, hash string) error {
 // For security purposes, the token itself is not stored in the database but rather
 // a hash of the token, exactly how passwords are handled. This method returns both
 // the generated token and the token entity which only contains the hash.
-func (c *AuthClient) GeneratePasswordResetToken(ctx echo.Context, userID int) (string, *ent.PasswordToken, error) {
+func (c *AuthClient) GeneratePasswordResetToken(
+	ctx echo.Context,
+	userID int,
+) (string, *ent.PasswordToken, error) {
 	// Generate the token, which is what will go in the URL, but not the database
 	token, err := c.RandomToken(c.config.App.PasswordToken.Length)
 	if err != nil {
@@ -135,7 +142,11 @@ func (c *AuthClient) GeneratePasswordResetToken(ctx echo.Context, userID int) (s
 // GetValidPasswordToken returns a valid, non-expired password token entity for a given user, token ID and token.
 // Since the actual token is not stored in the database for security purposes, if a matching password token entity is
 // found a hash of the provided token is compared with the hash stored in the database in order to validate.
-func (c *AuthClient) GetValidPasswordToken(ctx echo.Context, userID, tokenID int, token string) (*ent.PasswordToken, error) {
+func (c *AuthClient) GetValidPasswordToken(
+	ctx echo.Context,
+	userID, tokenID int,
+	token string,
+) (*ent.PasswordToken, error) {
 	// Ensure expired tokens are never returned
 	expiration := time.Now().Add(-c.config.App.PasswordToken.Expiration)
 
@@ -147,16 +158,19 @@ func (c *AuthClient) GetValidPasswordToken(ctx echo.Context, userID, tokenID int
 		Where(passwordtoken.CreatedAtGTE(expiration)).
 		Only(ctx.Request().Context())
 
-	switch err.(type) {
-	case *ent.NotFoundError:
-	case nil:
-		// Check the token for a hash match
-		if err := c.CheckPassword(token, pt.Token); err == nil {
-			return pt, nil
-		}
-	default:
-		if !context.IsCanceledError(err) {
-			return nil, err
+	{
+		var errCase0 *ent.NotFoundError
+		switch {
+		case errors.As(err, &errCase0):
+		case err == nil:
+			err := c.CheckPassword(token, pt.Token)
+			if err == nil {
+				return pt, nil
+			}
+		default:
+			if !context.IsCanceledError(err) {
+				return nil, err
+			}
 		}
 	}
 
@@ -174,18 +188,20 @@ func (c *AuthClient) DeletePasswordTokens(ctx echo.Context, userID int) error {
 	return err
 }
 
-// RandomToken generates a random token string of a given length
+// RandomToken generates a random token string of a given length.
 func (c *AuthClient) RandomToken(length int) (string, error) {
 	b := make([]byte, (length/2)+1)
 	if _, err := rand.Read(b); err != nil {
 		return "", err
 	}
+
 	token := hex.EncodeToString(b)
+
 	return token[:length], nil
 }
 
 // GenerateEmailVerificationToken generates an email verification token for a given email address using JWT which
-// is set to expire based on the duration stored in configuration
+// is set to expire based on the duration stored in configuration.
 func (c *AuthClient) GenerateEmailVerificationToken(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
@@ -196,7 +212,7 @@ func (c *AuthClient) GenerateEmailVerificationToken(email string) (string, error
 }
 
 // ValidateEmailVerificationToken validates an email verification token and returns the associated email address if
-// the token is valid and has not expired
+// the token is valid and has not expired.
 func (c *AuthClient) ValidateEmailVerificationToken(token string) (string, error) {
 	t, err := jwt.Parse(token, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -205,7 +221,6 @@ func (c *AuthClient) ValidateEmailVerificationToken(token string) (string, error
 
 		return []byte(c.config.App.EncryptionKey), nil
 	})
-
 	if err != nil {
 		return "", err
 	}
