@@ -7,4 +7,4 @@ We offer an <ins>user-friendly</ins> system with a strong focus on <ins>security
 
 
 
-![.]([https://www.psychologicalscience.org/redesign/wp-content/uploads/2025/10/v38-nov-electionfraud-featured-1-1024x581.jpg](https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png)
+![([https://www.psychologicalscience.org/redesign/wp-content/uploads/2025/10/v38-nov-electionfraud-featured-1-1024x581.jpg](https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png)]
