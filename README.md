@@ -7,4 +7,4 @@ We offer an <ins>user-friendly</ins> system with a strong focus on <ins>security
 
 
 
-![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://www.psychologicalscience.org/redesign/wp-content/uploads/2025/10/v38-nov-electionfraud-featured-1-1024x581.jpg)
+![What technically happens if the system behind the election is not secure enough.](https://www.psychologicalscience.org/redesign/wp-content/uploads/2025/10/v38-nov-electionfraud-featured-1-1024x581.jpg)
