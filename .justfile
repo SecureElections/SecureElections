@@ -2,41 +2,20 @@ set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set shell := ["bash", "-uc"]
 set quiet := true
 
-# Set variables by executing shell commands
-
-os_sysname := `uname -s | tr '[:upper:]' '[:lower:]'`
-os_machine := `uname -m`
-
-# Logic to determine the specific Tailwind package string
-
-tailwind_arch := if os_sysname == "linux" { "x64" } else { os_machine }
-tailwind_package := "tailwindcss-" + os_sysname + "-" + tailwind_arch
-
 default:
-    @just --list
+    just --list
 
 # Install all dependencies
-install: ent-install air-install tailwind-install node-install
+install: ent-install node-install
 
 # Install all node modules
 node-install:
     npm install
 
-# Install the Tailwind CSS CLI
-tailwind-install:
-    curl -sLo tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/latest/download/{{ tailwind_package }}
-    chmod +x tailwindcss
-    curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
-    curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
-
 # Install Ent code-generation module
 ent-install:
     go get entgo.io/ent/cmd/ent
-
-# Install air
-air-install:
-    go install github.com/air-verse/air@latest
-
+    
 # Generate (Ent) code
 gen:
     go generate ./...
@@ -63,15 +42,15 @@ run:
 # Run the application and watch for changes with air to automatically rebuild
 watch:
     clear
-    air
+    go run github.com/air-verse/air@latest
 
 # Run all tests
 test:
-    go test ./...
+    go test ./... -race
 
 # Build and minify Tailwind CSS
 css:
-    ./tailwindcss -i tailwind.css -o public/static/main.css -m
+    npx @tailwindcss/cli -i tailwind.css -o public/static/main.css -m
 
 # Build CSS and compile the application binary
 build: css
