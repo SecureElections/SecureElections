@@ -7,4 +7,4 @@ We offer an <ins>user-friendly</ins> system with a strong focus on <ins>security
 
 
 
-![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.]([https://myoctocat.com/assets/images/base-octocat.svg](https://youth.europa.eu/get-involved/democratic-participation/eu-elections-different-ways-of-voting-across-europe_de))
+![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.]((https://youth.europa.eu/get-involved/democratic-participation/eu-elections-different-ways-of-voting-across-europe_de))
