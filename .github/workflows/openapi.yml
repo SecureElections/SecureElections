@@ -63,7 +63,7 @@ jobs:
         run: npx redocly build-docs tmp/openapi-bundled.yaml -o tmp/api-docs.html
 
       - name: Upload Documentation
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-docs
           path: tmp/api-docs.html
