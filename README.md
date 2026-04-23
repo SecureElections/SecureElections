@@ -7,4 +7,4 @@ We offer an <ins>user-friendly</ins> system with a strong focus on <ins>security
 
 
 
-![What technically happens if the system behind the election is not secure enough.](https://www.psychologicalscience.org/redesign/wp-content/uploads/2025/10/v38-nov-electionfraud-featured-1-1024x581.jpg | width=100)
+<img>https://www.psychologicalscience.org/redesign/wp-content/uploads/2025/10/v38-nov-electionfraud-featured-1-1024x581.jpg)
