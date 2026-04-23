@@ -20,4 +20,4 @@
 
 [^1]: How to run your own plattform.
 
-  <img src="https://www.gstatic.com/_/boq-sdlc-agents-ui/_/r/Mvosg4klCA4.svg" alt="Ask Code Wiki" height="100">
+  <img src="https://thumbs.dreamstime.com/b/illustration-business-activities-419413436.jpg?w=768" alt="Ask Code Wiki" height="100">
