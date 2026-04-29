@@ -65,5 +65,5 @@ jobs:
       - name: Upload Documentation
         uses: actions/upload-artifact@v7
         with:
-          name: api-docs
+          archive: false
           path: tmp/api-docs.html
