@@ -1,4 +1,4 @@
-name: vulnerability
+name: bug report
 description: File a Bug report.
 title: "[Bug]: "
 labels: ["triage"]
@@ -30,7 +30,7 @@ body:
   - type: dropdown
     id: impact
     attributes:
-      label: Scope
+      label: scopes
       description: how large was the Impact
       options:
       - neglectable 
