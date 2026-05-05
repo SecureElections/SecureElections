@@ -1,8 +1,8 @@
 name: vulnerability
-description: File a vulnerability.
+description: File a Bug report .
 title: "[Bug]: "
 labels: ["triage"]
-projects: ["SecureElections/SecureElections/Scrum board"]
+projects: [SecureElections/SecureElections/Scrum board]
 assignees:
   - Nasraell
   - SoGam34
