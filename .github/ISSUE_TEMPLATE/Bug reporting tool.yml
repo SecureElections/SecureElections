@@ -1,12 +1,10 @@
 name: vulnerability
-description: File a Bug report .
+description: File a Bug report.
 title: "[Bug]: "
 labels: ["triage"]
 projects: [SecureElections/SecureElections/Scrum board]
 assignees:
-  - Nasraell
   - SoGam34
-
 body:
   - type: markdown
     attributes:
