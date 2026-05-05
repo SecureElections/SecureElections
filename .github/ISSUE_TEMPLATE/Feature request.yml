@@ -1,7 +1,7 @@
 
 
-name: vulnerability
-description: File a vulnerability.
+name: Feature request
+description: File a Feature request .
 title: "[vulnerability]: "
 labels: ["triage"]
 projects: [SecureElections/SecureElections/Scrum board"]
