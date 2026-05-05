@@ -2,7 +2,7 @@ name: bug report
 description: File a Bug report.
 title: "[Bug]: "
 labels: ["triage"]
-projects: [SecureElections/SecureElections/Scrum board]
+projects: [SecureElections/2]
 assignees:
   - SoGam34
 body:
