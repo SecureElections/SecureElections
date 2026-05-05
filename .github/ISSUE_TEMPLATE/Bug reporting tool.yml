@@ -1,19 +1,15 @@
-
-
-name: vulnerability
-description: File a vulnerability.
-title: "[vulnerability]: "
+name: bug report
+description: File a Bug report.
+title: "[Bug]: "
 labels: ["triage"]
-projects: [SecureElections/SecureElections/Scrum board"]
+projects: [SecureElections/2]
 assignees:
-  - Nasraell
   - SoGam34
-
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this vulnerability report!
+       Thanks for taking the time to fill out this bug report!
   - type: input
     id: contact
     attributes:
@@ -26,22 +22,21 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
+      description: "How do you trigger this bug? Please walk us through it step by step."
       placeholder: Tell us what you see!
-      value: "Something happened!"
+      value: "A Bug happened!"
     validations:
       required: true
   - type: dropdown
-    id: version
+    id: impact
     attributes:
-      label: Scope
-      description: If you Had to Guess the Scope?
+      label: scopes
+      description: how large was the Impact
       options:
       - neglectable 
       - minior 
       - medium 
-      - lage 
-      - Holy Fuck 
+      - large  
       default: 0
     validations:
       required: true
