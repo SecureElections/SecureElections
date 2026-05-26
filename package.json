@@ -2,7 +2,7 @@
   "devDependencies": {
     "@apisyouwonthate/style-guide": "1.5.0",
     "@redocly/cli": "2.31.2",
-    "@stoplight/spectral-cli": "6.15.1",
+    "@stoplight/spectral-cli": "6.16.0",
     "@tailwindcss/cli": "4.3.0",
     "@tailwindcss/typography": "0.5.19",
     "daisyui": "5.5.20",
