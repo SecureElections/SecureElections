@@ -5,7 +5,7 @@
     "@stoplight/spectral-cli": "6.15.1",
     "@tailwindcss/cli": "4.3.0",
     "@tailwindcss/typography": "0.5.19",
-    "daisyui": "5.5.20",
+    "daisyui": "5.5.23",
     "prettier": "3.8.3",
     "tailwindcss": "4.3.0"
   }
