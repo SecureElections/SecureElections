@@ -1,53 +1,53 @@
-
-
 name: Feature request
-description: File a Feature request .
-title: "[vulnerability]: "
-labels: ["triage"]
-projects: [SecureElections/SecureElections/Scrum board"]
+description: Suggest a new feature or improvement for this project
+title: "[Feature]: "
+labels: ["enhancement"]
 assignees:
   - Nasraell
-  - SoGam34
-
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this vulnerability report!
-  - type: input
-    id: contact
+        Thanks for taking the time to suggest a new feature! Please fill out the details below as clearly as you can.
+
+  - type: checkboxes
+    id: existing-issue-check
     attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: examplee-mail@example.com
+      label: Is there an existing issue for this?
+      description: Please search to see if a similar feature request already exists before opening a new one.
+      options:
+        - label: I have searched the existing issues and this feature has not already been requested.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem does this solve, or why is this feature needed?
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature or change you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've considered.
     validations:
       required: false
+
   - type: textarea
-    id: what-happened
+    id: additional-context
     attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "Something happened!"
+      label: Additional Context
+      description: Add any other context, screenshots, or mockups about the feature request here.
     validations:
-      required: true
-  - type: dropdown
-    id: version
-    attributes:
-      label: Scope
-      description: If you Had to Guess the Scope?
-      options:
-      - neglectable 
-      - minior 
-      - medium 
-      - lage 
-      - Holy Fuck 
-      default: 0
-    validations:
-      required: true
-  - type: upload
-    id: screenshots
-    attributes:
-      label: Upload screenshots
-      description: If applicable, add screenshots to help explain your problem.
-    validations:
+      required: false
